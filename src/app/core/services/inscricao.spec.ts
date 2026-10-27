@@ -15,6 +15,43 @@ describe('InscricaoService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('cancela somente o participante escolhido e libera seu e-mail', () => {
+    service.cadastrar({ nome: 'Maria Silva', email: 'maria@exemplo.com', nascimento: '2000-05-10', distancia: 'KM_5' });
+    service.cadastrar({ nome: 'João Silva', email: 'joao@exemplo.com', nascimento: '1990-05-10', distancia: 'KM_10' });
+    expect(service.cancelar(' MARIA@EXEMPLO.COM ').sucesso).toBe(true);
+    expect(service.inscricoes().map(item => item.email)).toEqual(['joao@exemplo.com']);
+    expect(service.cadastrar({ nome: 'Maria Silva', email: 'maria@exemplo.com', nascimento: '2000-05-10', distancia: 'KM_5' }).sucesso).toBe(true);
+  });
+
+  it('avisa sobre JSON corrompido sem apagar os dados originais', () => {
+    TestBed.resetTestingModule();
+    localStorage.setItem('corrida.inscricoes.v1', '{invalido');
+    const novoServico = TestBed.inject(InscricaoService);
+    expect(novoServico.inscricoes()).toEqual([]);
+    expect(novoServico.avisoArmazenamento()).toContain('Não foi possível ler');
+    expect(localStorage.getItem('corrida.inscricoes.v1')).toBe('{invalido');
+  });
+
+  it('rejeita registros armazenados sem a estrutura esperada', () => {
+    TestBed.resetTestingModule();
+    localStorage.setItem('corrida.inscricoes.v1', JSON.stringify([{}]));
+    const novoServico = TestBed.inject(InscricaoService);
+    expect(novoServico.inscricoes()).toEqual([]);
+    expect(novoServico.avisoArmazenamento()).toContain('inválidos');
+  });
+
+  it('não altera a lista quando o armazenamento falha', () => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = () => { throw new Error('sem espaço'); };
+    try {
+      const resultado = service.cadastrar({ nome: 'Maria Silva', email: 'maria@exemplo.com', nascimento: '2000-05-10', distancia: 'KM_5' });
+      expect(resultado).toEqual({ sucesso: false, erro: 'ERRO_ARMAZENAMENTO' });
+      expect(service.inscricoes()).toEqual([]);
+    } finally {
+      Storage.prototype.setItem = original;
+    }
+  });
+
   it('deve cadastrar um participante válido', () => {
     const resultado = service.cadastrar ({
       nome: 'Maria Silva',

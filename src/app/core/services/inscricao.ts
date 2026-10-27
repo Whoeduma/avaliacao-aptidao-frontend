@@ -1,6 +1,7 @@
 
 import { Injectable, signal } from '@angular/core';
 import { Inscricao } from '../../models/inscricao.model';
+import { DATA_PROVA } from '../../dominio/evento.config';
 import {
   normalizarEmail,
   avaliarInscricao,
@@ -21,7 +22,7 @@ export interface DadosCadastro {
 }
 
 export type ResultadoCadastro =
-  | { sucesso: true }
+  | { sucesso: true; erro?: never }
   | {
       sucesso: false;
       erro:
@@ -45,6 +46,7 @@ export type ResultadoCancelamento =
   providedIn: 'root'
 })
 export class InscricaoService {
+  readonly avisoArmazenamento = signal('');
   private readonly inscricoesSignal = signal<Inscricao[]>(
     this.carregarInscricoes()
   );
@@ -61,14 +63,28 @@ export class InscricaoService {
 
       const inscricoes = JSON.parse(dados);
 
-      if (!Array.isArray(inscricoes)) {
+      if (!Array.isArray(inscricoes) || !inscricoes.every((item: unknown) => this.inscricaoArmazenadaValida(item))) {
+        this.avisoArmazenamento.set('Os dados salvos estão inválidos. A lista foi iniciada vazia. Um novo cadastro substituirá os dados armazenados.');
         return [];
       }
 
       return inscricoes;
     } catch {
+      this.avisoArmazenamento.set('Não foi possível ler as inscrições salvas. A lista foi iniciada vazia. Um novo cadastro substituirá os dados armazenados.');
       return [];
     }
+  }
+
+  private inscricaoArmazenadaValida(item: unknown): item is Inscricao {
+    if (typeof item !== 'object' || item === null) return false;
+    const registro = item as Record<string, unknown>;
+    if (typeof registro['nome'] !== 'string' || !validarNome(registro['nome']) ||
+        typeof registro['email'] !== 'string' || !validarEmail(registro['email']) ||
+        typeof registro['nascimento'] !== 'string' || !validarNascimento(registro['nascimento']) ||
+        (registro['distancia'] !== 'KM_5' && registro['distancia'] !== 'KM_10')) return false;
+    const avaliacao = avaliarInscricao(registro['nascimento'], registro['distancia'], DATA_PROVA);
+    return avaliacao.aceita && registro['idadeNaProva'] === avaliacao.idadeNaProva &&
+      registro['categoria'] === avaliacao.categoria;
   }
 
   private salvarInscricoes(inscricoes: Inscricao[]): boolean {
@@ -123,7 +139,7 @@ export class InscricaoService {
     const avaliacao = avaliarInscricao(
       dados.nascimento,
       dados.distancia,
-      '2027-03-14'
+      DATA_PROVA
     );
 
     if (!avaliacao.aceita) {
@@ -219,7 +235,7 @@ editar(
   const avaliacao = avaliarInscricao(
     dados.nascimento,
     dados.distancia,
-    '2027-03-14'
+    DATA_PROVA
   );
 
   if (!avaliacao.aceita) {

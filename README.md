@@ -7,7 +7,7 @@ A proposta foi criar um sistema para gerenciar as inscrições da **5ª Corrida 
 
 ## 💻 Tecnologias utilizadas
 
-- Angular 22 (CLI 22.2.4)
+- Angular 21
 - TypeScript
 - HTML5 e CSS3
 - Angular Signals
@@ -52,7 +52,7 @@ Entre na pasta:
 
 Instale as dependências:
 
-    npm install
+    npm ci
 
 Inicie o projeto:
 
@@ -91,3 +91,28 @@ A ideia foi deixar a aplicação simples de usar, mas com as funcionalidades nec
 ---
 
 Feito por **Eduarda Martins** 💜
+
+## Entendimento do problema
+
+O sistema gerencia localmente inscrições para a 5ª Corrida Solidária da Vila Esperança. Cada e-mail identifica uma única inscrição. Nome, nascimento e percurso podem ser alterados; idade e categoria são sempre calculadas. O cancelamento remove apenas a inscrição selecionada. Não há integração com servidor.
+
+## Fontes, conflitos e decisões
+
+- Fontes: enunciado da avaliação, pacote do cliente e regulamento oficial incluídos no material fornecido.
+- A data oficial da prova é **14/03/2027**. A menção a 13/03/2027 no áudio não prevalece sobre o regulamento.
+- A categoria é calculada pela idade completa na data da prova, não apenas pelo ano de nascimento.
+- A regra de e-mail único prevalece sobre a sugestão de compartilhar e-mail entre familiares. Normalizamos apenas espaços externos e maiúsculas/minúsculas; não removemos pontos de endereços Gmail.
+- O e-mail é o identificador e não pode ser alterado na edição. A aplicação começa sem registros de demonstração.
+
+## Perguntas ao cliente
+
+- Há necessidade futura de inscrições familiares com e-mails próprios ou identificador adicional?
+- Em uma futura versão com servidor, haverá conta de usuário e sincronização entre dispositivos?
+
+## Fora de escopo
+
+Envio de e-mails, pagamento/Pix, autenticação, integração com servidor e sincronização entre navegadores.
+
+## Verificações realizadas
+
+Executar `npm ci`, `npm run build` e `npm test -- --watch=false`. Os testes incluem regras de idade e percurso, CRUD, armazenamento corrompido/falho e configuração das rotas. Conferir também manualmente a navegação direta, atualização de página e layout em telas pequenas.

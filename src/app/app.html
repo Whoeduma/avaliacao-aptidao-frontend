@@ -54,6 +54,9 @@
 </header>
 
 <main class="conteudo-principal">
+  @if (avisoArmazenamento(); as aviso) {
+    <p role="alert" class="aviso-armazenamento">{{ aviso }}</p>
+  }
   <router-outlet></router-outlet>
 </main>
 
