@@ -1,59 +1,93 @@
-# CorridaSolidaria
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.4.
+# 🏃‍♀️ Corrida Solidária
 
-## Development server
+Projeto desenvolvido como parte de uma avaliação prática de front-end utilizando Angular e TypeScript.
 
-To start a local development server, run:
+A proposta foi criar um sistema para gerenciar as inscrições da **5ª Corrida Solidária da Vila Esperança**, permitindo cadastrar participantes, visualizar suas informações, editar e cancelar inscrições.
 
-```bash
-ng serve
-```
+## 💻 Tecnologias utilizadas
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Angular 22 (CLI 22.2.4)
+- TypeScript
+- HTML5 e CSS3
+- Angular Signals
+- Angular Router
+- Vitest
+- LocalStorage
 
-## Code scaffolding
+## ✨ Funcionalidades
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- 📝 Cadastro de participantes nos percursos de 5 km e 10 km
+- 👥 Listagem das inscrições realizadas
+- 🔎 Pesquisa por nome ou e-mail
+- 📋 Visualização dos detalhes de cada inscrição
+- ✏️ Edição dos dados dos participantes
+- 🗑️ Cancelamento de inscrições com confirmação
+- 📊 Contadores de inscritos por percurso
+- ✅ Mensagens de sucesso após cadastro e edição
+- 📱 Layout responsivo
 
-```bash
-ng generate component component-name
-```
+## 📌 Regras de negócio
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Para garantir que as inscrições sejam feitas corretamente, implementei algumas validações:
 
-```bash
-ng generate --help
-```
+- O nome precisa ter entre 3 e 100 caracteres;
+- O e-mail deve ser válido e não pode estar cadastrado em outra inscrição;
+- A idade mínima para participar é de 14 anos;
+- Menores de 18 anos só podem participar dos 5 km;
+- A idade é calculada considerando a data da corrida, **14/03/2027**;
+- A categoria é definida automaticamente de acordo com a idade do participante.
 
-## Building
+As categorias são: **Juvenil, Adulto, Master e Senior**.
 
-To build the project run:
+## 🚀 Como executar
 
-```bash
-ng build
-```
+Clone o repositório:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+    git clone https://github.com/Whoeduma/avaliacao-aptidao-frontend.git
 
-## Running unit tests
+Entre na pasta:
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+    cd avaliacao-aptidao-frontend
 
-```bash
-ng test
-```
+Instale as dependências:
 
-## Running end-to-end tests
+    npm install
 
-For end-to-end (e2e) testing, run:
+Inicie o projeto:
 
-```bash
-ng e2e
-```
+    npm start
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Acesse no navegador:
 
-## Additional Resources
+**http://localhost:4200**
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🧪 Testes
+
+Os testes automatizados são executados com Vitest.
+
+Para rodar os testes:
+
+    npm test -- --watch=false
+
+Para gerar o build de produção:
+
+    npm run build
+
+## 💾 Armazenamento
+
+As inscrições são salvas no **LocalStorage** do navegador.
+
+Como o projeto não utiliza um back-end, os dados ficam armazenados localmente e continuam disponíveis mesmo após atualizar a página.
+
+## 🎨 Sobre o desenvolvimento
+
+Durante o desenvolvimento, procurei organizar o código separando os componentes, serviços, modelos e regras de negócio.
+
+Também dei atenção às validações, à responsividade e à experiência de quem vai utilizar o sistema, principalmente nos formulários e nas ações de edição e cancelamento.
+
+A ideia foi deixar a aplicação simples de usar, mas com as funcionalidades necessárias para gerenciar as inscrições.
+
+---
+
+Feito por **Eduarda Martins** 💜

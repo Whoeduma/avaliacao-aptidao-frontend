@@ -56,3 +56,56 @@
 <main class="conteudo-principal">
   <router-outlet></router-outlet>
 </main>
+
+
+
+@if (mensagemSucesso(); as mensagem) {
+  <div class="fundo-notificacao">
+    <section
+      class="modal-sucesso"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="titulo-sucesso"
+      aria-describedby="descricao-sucesso"
+    >
+      <div class="icone-modal-sucesso">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="36"
+          height="36"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="m8 12 2.5 2.5L16 9" />
+        </svg>
+      </div>
+
+      <h2 id="titulo-sucesso">
+        {{ mensagem }}
+      </h2>
+
+      <p id="descricao-sucesso">
+        @if (mensagem.includes('atualizada')) {
+          As alterações foram salvas.
+        } @else {
+          O participante foi cadastrado.
+        }
+      </p>
+
+      <button
+        type="button"
+        class="botao-continuar-sucesso"
+        (click)="fecharNotificacao()"
+      >
+        Continuar
+      </button>
+    </section>
+  </div>
+}
+

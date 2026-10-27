@@ -128,6 +128,18 @@
   font-size: 14px;
 }
 
+.icone-estado-vazio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--primaria-suave);
+  color: var(--primaria);
+}
+
 .link-nova-inscricao {
   color: var(--primaria);
   font-weight: 600;
@@ -143,7 +155,7 @@
 
 .lista-inscricoes {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 330px));
+  grid-template-columns: repeat(3, minmax(0, 330px));
   gap: 12px;
   align-items: start;
 }
@@ -332,6 +344,12 @@
   outline-offset: 2px;
 }
 
+@media (max-width: 1050px) {
+  .lista-inscricoes {
+    grid-template-columns: repeat(2, minmax(0, 330px));
+  }
+}
+
 /* Ajustes para telas menores */
 
 @media (max-width: 740px) {
@@ -490,4 +508,73 @@
 .botao-detalhes:hover,
 .botao-editar:hover {
   text-decoration: underline;
+}
+
+
+/* Campo de pesquisa */
+
+.area-pesquisa {
+  margin: 0 0 20px;
+}
+
+.campo-pesquisa {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 380px;
+  padding: 0 14px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campo-pesquisa:focus-within {
+  border-color: var(--primaria);
+  box-shadow: 0 0 0 3px var(--primaria-suave);
+}
+
+.campo-pesquisa svg {
+  flex-shrink: 0;
+  color: var(--texto-fraco);
+}
+
+.campo-pesquisa input {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  font-size: 13px;
+}
+
+.campo-pesquisa input::placeholder {
+  color: var(--texto-fraco);
+}
+
+/* Pesquisa sem resultados */
+
+.sem-resultados {
+  padding: 32px 20px;
+  background: var(--superficie);
+  border: 1px dashed var(--borda-forte);
+  border-radius: var(--raio);
+  text-align: center;
+}
+
+.sem-resultados h2 {
+  margin: 0 0 8px;
+  color: var(--texto);
+  font-size: 16px;
+}
+
+.sem-resultados p {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 13px;
 }

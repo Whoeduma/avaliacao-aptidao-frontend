@@ -2,6 +2,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { Notificacao } from '../../core/services/notificacao';
 
 import {
   InscricaoService,
@@ -26,6 +27,7 @@ export class NovaInscricao {
 
   private readonly inscricaoService = inject(InscricaoService);
   private readonly router = inject(Router);
+  private readonly notificacao = inject(Notificacao);
 
   // Dados preenchidos pelo usuário
   dados: {
@@ -84,12 +86,18 @@ export class NovaInscricao {
 
     const resultado = this.inscricaoService.cadastrar(dadosCadastro);
 
+    
     if (resultado.sucesso) {
+      this.notificacao.mostrarSucesso(
+        'Inscrição realizada com sucesso!'
+      );
+
       this.router.navigate(['/inscricoes']);
       return;
     }
 
     this.mostrarErro(resultado.erro);
+
   }
 
   private mostrarErro(

@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-
 import { InscricaoService } from '../../core/services/inscricao';
 import { Distancia } from '../../dominio/inscricao.regras';
+import { Notificacao } from '../../core/services/notificacao';
 
 @Component({
   selector: 'app-editar-inscricao',
@@ -15,6 +15,7 @@ export class EditarInscricao {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly inscricaoService = inject(InscricaoService);
+  private readonly notificacao = inject(Notificacao);
 
   readonly email = this.route.snapshot.paramMap.get('email') ?? '';
   readonly inscricao = this.inscricaoService.obterPorEmail(this.email);
@@ -48,6 +49,12 @@ export class EditarInscricao {
       return;
     }
 
-    this.router.navigate(['/inscricoes']);
+    
+      this.notificacao.mostrarSucesso(
+        'Inscrição atualizada com sucesso!'
+      );
+
+      this.router.navigate(['/inscricoes']);
+
   }
 }

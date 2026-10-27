@@ -54,10 +54,59 @@
     <span>· /inscricoes</span>
   </nav>
 
+  <!-- Pesquisa por nome ou e-mail -->
+  <div class="area-pesquisa">
+    <div class="campo-pesquisa">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.35-4.35" />
+      </svg>
+
+      <input
+        type="search"
+        placeholder="Buscar por nome ou e-mail..."
+        aria-label="Buscar participantes por nome ou e-mail"
+        [value]="busca()"
+        (input)="atualizarBusca($event)"
+      />
+    </div>
+  </div>
+
   <!-- Nenhum participante cadastrado -->
   @if (inscricoes().length === 0) {
 
     <div class="estado-vazio">
+      <div class="icone-estado-vazio">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      </div>
+
       <h2>Nenhuma inscrição por enquanto</h2>
 
       <p>
@@ -72,12 +121,20 @@
       </p>
     </div>
 
+  } @else if (inscricoesFiltradas().length === 0) {
+
+    <!-- Existem inscrições, mas nenhuma corresponde à pesquisa -->
+    <div class="sem-resultados">
+      <h2>Nenhum participante encontrado</h2>
+      <p>Tente buscar por outro nome ou e-mail.</p>
+    </div>
+
   } @else {
 
     <!-- Participantes cadastrados -->
     <div class="lista-inscricoes">
 
-      @for (inscricao of inscricoes(); track inscricao.email) {
+      @for (inscricao of inscricoesFiltradas(); track inscricao.email) {
 
         <article class="cartao-inscricao">
 
@@ -101,7 +158,7 @@
 
             </div>
 
-            
+            <!-- Categoria e distância -->
             <div class="etiquetas-participante">
 
               <div class="categoria-participante">
@@ -122,44 +179,55 @@
 
               </div>
 
-            <span class="etiqueta-distancia">
+              <span class="etiqueta-distancia">
 
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="6" cy="19" r="2" />
-                <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
-                <circle cx="18" cy="5" r="2" />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="6" cy="19" r="2" />
+                  <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+                  <circle cx="18" cy="5" r="2" />
+                </svg>
 
-              {{ inscricao.distancia === 'KM_5' ? '5 km' : '10 km' }}
+                {{ inscricao.distancia === 'KM_5' ? '5 km' : '10 km' }}
 
-            </span>
+              </span>
 
             </div>
 
           </div>
 
+          <!-- Ações do card -->
           <div class="cartao-acoes">
 
-            <a [routerLink]="['/inscricoes', inscricao.email]" class="botao-detalhes">
+            <a
+              [routerLink]="['/inscricoes', inscricao.email]"
+              class="botao-detalhes"
+            >
               Detalhes
             </a>
 
-            <a [routerLink]="['/inscricoes', inscricao.email, 'editar']" class="botao-editar">
+            <a
+              [routerLink]="['/inscricoes', inscricao.email, 'editar']"
+              class="botao-editar"
+            >
               Editar
             </a>
 
-            <button type="button" class="botao-cancelar-inscricao" (click)="abrirCancelamento(inscricao)">
+            <button
+              type="button"
+              class="botao-cancelar-inscricao"
+              (click)="abrirCancelamento(inscricao)"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="14"
@@ -180,13 +248,11 @@
               </svg>
 
               Cancelar inscrição
-
             </button>
 
           </div>
 
         </article>
-
       }
 
     </div>
@@ -198,9 +264,11 @@
 <!-- Modais das inscrições -->
 <router-outlet></router-outlet>
 
-
+<!-- Modal de confirmação de cancelamento -->
 @if (inscricaoParaCancelar; as inscricao) {
+
   <div class="fundo-modal-cancelamento">
+
     <section
       class="modal-cancelamento"
       role="alertdialog"
@@ -208,7 +276,9 @@
       aria-labelledby="titulo-cancelamento"
       aria-describedby="descricao-cancelamento"
     >
+
       <div class="modal-cancelamento-cabecalho">
+
         <div class="icone-cancelamento">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -231,12 +301,18 @@
         </div>
 
         <div>
-          <h2 id="titulo-cancelamento">Cancelar inscrição?</h2>
+          <h2 id="titulo-cancelamento">
+            Cancelar inscrição?
+          </h2>
           <p>Essa ação não poderá ser desfeita.</p>
         </div>
+
       </div>
 
-      <p id="descricao-cancelamento" class="texto-cancelamento">
+      <p
+        id="descricao-cancelamento"
+        class="texto-cancelamento"
+      >
         Tem certeza que deseja cancelar a inscrição de
         <strong>{{ inscricao.nome }}</strong>?
       </p>
@@ -248,6 +324,7 @@
       }
 
       <div class="acoes-modal-cancelamento">
+
         <button
           type="button"
           class="botao-voltar-cancelamento"
@@ -261,10 +338,12 @@
           class="botao-confirmar-cancelamento"
           (click)="confirmarCancelamento()"
         >
-         Cancelar
+          Cancelar
         </button>
+
       </div>
+
     </section>
+
   </div>
 }
-
