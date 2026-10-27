@@ -151,15 +151,15 @@
 
           <div class="cartao-acoes">
 
-            <span class="acao-em-breve">
+            <a [routerLink]="['/inscricoes', inscricao.email]" class="botao-detalhes">
               Detalhes
-            </span>
+            </a>
 
-            <span class="acao-em-breve">
+            <a [routerLink]="['/inscricoes', inscricao.email, 'editar']" class="botao-editar">
               Editar
-            </span>
+            </a>
 
-            <button type="button" class="botao-cancelar-inscricao">
+            <button type="button" class="botao-cancelar-inscricao" (click)="abrirCancelamento(inscricao)">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="14"
@@ -195,5 +195,76 @@
 
 </section>
 
-<!-- Pop-up de nova inscrição -->
+<!-- Modais das inscrições -->
 <router-outlet></router-outlet>
+
+
+@if (inscricaoParaCancelar; as inscricao) {
+  <div class="fundo-modal-cancelamento">
+    <section
+      class="modal-cancelamento"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="titulo-cancelamento"
+      aria-describedby="descricao-cancelamento"
+    >
+      <div class="modal-cancelamento-cabecalho">
+        <div class="icone-cancelamento">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 6h18" />
+            <path d="M8 6V4h8v2" />
+            <path d="M19 6l-1 14H6L5 6" />
+            <path d="M10 10v6" />
+            <path d="M14 10v6" />
+          </svg>
+        </div>
+
+        <div>
+          <h2 id="titulo-cancelamento">Cancelar inscrição?</h2>
+          <p>Essa ação não poderá ser desfeita.</p>
+        </div>
+      </div>
+
+      <p id="descricao-cancelamento" class="texto-cancelamento">
+        Tem certeza que deseja cancelar a inscrição de
+        <strong>{{ inscricao.nome }}</strong>?
+      </p>
+
+      @if (erroCancelamento) {
+        <p class="erro-cancelamento" role="alert">
+          {{ erroCancelamento }}
+        </p>
+      }
+
+      <div class="acoes-modal-cancelamento">
+        <button
+          type="button"
+          class="botao-voltar-cancelamento"
+          (click)="fecharCancelamento()"
+        >
+          Voltar
+        </button>
+
+        <button
+          type="button"
+          class="botao-confirmar-cancelamento"
+          (click)="confirmarCancelamento()"
+        >
+         Cancelar
+        </button>
+      </div>
+    </section>
+  </div>
+}
+

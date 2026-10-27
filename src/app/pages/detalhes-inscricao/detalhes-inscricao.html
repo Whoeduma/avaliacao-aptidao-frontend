@@ -1,0 +1,88 @@
+
+<div class="fundo-modal-detalhes">
+  <section
+    class="modal-detalhes"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-detalhes"
+  >
+    @if (inscricao(); as participante) {
+      <div class="cabecalho-modal-detalhes">
+        <div>
+          <h2 id="titulo-detalhes">Detalhes da inscrição</h2>
+          <p>Informações do participante</p>
+        </div>
+
+        <a
+          routerLink="/inscricoes"
+          class="fechar-modal-detalhes"
+          aria-label="Fechar detalhes"
+        >
+          &times;
+        </a>
+      </div>
+
+      <div class="conteudo-modal-detalhes">
+        <div class="campo-detalhes">
+          <span>Nome completo</span>
+          <strong>{{ participante.nome }}</strong>
+        </div>
+
+        <div class="campo-detalhes">
+          <span>E-mail</span>
+          <strong>{{ participante.email }}</strong>
+        </div>
+
+        <div class="linha-detalhes">
+          <div class="campo-detalhes">
+            <span>Data de nascimento</span>
+            <strong>{{ formatarData(participante.nascimento) }}</strong>
+          </div>
+
+          <div class="campo-detalhes">
+            <span>Idade na prova</span>
+            <strong>{{ participante.idadeNaProva }} anos</strong>
+          </div>
+        </div>
+
+        <div class="linha-detalhes">
+          <div class="campo-detalhes">
+            <span>Categoria</span>
+
+            <span
+              class="etiqueta-categoria"
+              [class.categoria-juvenil]="participante.categoria === 'JUVENIL'"
+              [class.categoria-adulto]="participante.categoria === 'ADULTO'"
+              [class.categoria-master]="participante.categoria === 'MASTER'"
+              [class.categoria-senior]="participante.categoria === 'SENIOR'"
+            >
+              {{ participante.categoria }}
+            </span>
+          </div>
+
+          <div class="campo-detalhes">
+            <span>Percurso</span>
+            <span class="etiqueta-distancia">
+              {{ participante.distancia === 'KM_5' ? '5 km' : '10 km' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rodape-modal-detalhes">
+        <a routerLink="/inscricoes" class="botao-fechar-detalhes">
+          Fechar
+        </a>
+      </div>
+    } @else {
+      <div class="conteudo-modal-detalhes">
+        <h2 id="titulo-detalhes">Inscrição não encontrada</h2>
+        <p>Não encontramos uma inscrição com esse e-mail.</p>
+
+        <a routerLink="/inscricoes" class="botao-fechar-detalhes">
+          Voltar às inscrições
+        </a>
+      </div>
+    }
+  </section>
+</div>

@@ -1,7 +1,8 @@
-import { Routes } from '@angular/router';
 
+import { Routes } from '@angular/router';
 import { Inscricoes } from './pages/inscricoes/inscricoes';
 import { NovaInscricao } from './pages/nova-inscricao/nova-inscricao';
+import { DetalhesInscricao } from './pages/detalhes-inscricao/detalhes-inscricao';
 
 export const routes: Routes = [
   {
@@ -16,6 +17,10 @@ export const routes: Routes = [
       {
         path: 'nova',
         component: NovaInscricao
+      },
+      {
+        path: ':email',
+        component: DetalhesInscricao
       }
     ]
   }
