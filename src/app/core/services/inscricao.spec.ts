@@ -137,4 +137,87 @@ describe('InscricaoService', () => {
   expect(service.inscricoes().length).toBe(0);
   });
 
+  
+  it('deve editar o nome de um participante', () => {
+    service.cadastrar({
+      nome: 'Maria Silva',
+      email: 'maria@gmail.com',
+      nascimento: '2000-05-10',
+      distancia: 'KM_5'
+    });
+
+    const resultado = service.editar('maria@gmail.com', {
+      nome: 'Maria Oliveira',
+      nascimento: '2000-05-10',
+      distancia: 'KM_5'
+    });
+
+    expect(resultado.sucesso).toBe(true);
+    expect(service.inscricoes()[0].nome).toBe('Maria Oliveira');
+    expect(service.inscricoes()[0].email).toBe('maria@gmail.com');
+    expect(service.inscricoes().length).toBe(1);
+  });
+
+  it('não deve permitir editar para 10 km se o participante for menor de 18 anos', () => {
+    service.cadastrar({
+      nome: 'Ana Silva',
+      email: 'ana@gmail.com',
+      nascimento: '2010-05-10',
+      distancia: 'KM_5'
+    });
+
+    const resultado = service.editar('ana@gmail.com', {
+      nome: 'Ana Silva',
+      nascimento: '2010-05-10',
+      distancia: 'KM_10'
+    });
+
+    expect(resultado.sucesso).toBe(false);
+
+    if (!resultado.sucesso) {
+      expect(resultado.erro).toBe('DISTANCIA_NAO_PERMITIDA');
+    }
+
+    expect(service.inscricoes()[0].distancia).toBe('KM_5');
+  });
+
+  it('deve atualizar a categoria quando a data de nascimento mudar', () => {
+    service.cadastrar({
+      nome: 'Carlos Souza',
+      email: 'carlos@gmail.com',
+      nascimento: '2010-05-10',
+      distancia: 'KM_5'
+    });
+
+    expect(service.inscricoes()[0].categoria).toBe('JUVENIL');
+
+    const resultado = service.editar('carlos@gmail.com', {
+      nome: 'Carlos Souza',
+      nascimento: '2000-05-10',
+      distancia: 'KM_10'
+    });
+
+    expect(resultado.sucesso).toBe(true);
+    expect(service.inscricoes()[0].categoria).toBe('ADULTO');
+    expect(service.inscricoes()[0].distancia).toBe('KM_10');
+    expect(service.inscricoes()[0].idadeNaProva).toBe(26);
+  });
+
+  it('não deve editar uma inscrição inexistente', () => {
+    const resultado = service.editar('inexistente@gmail.com', {
+      nome: 'Pessoa Teste',
+      nascimento: '2000-05-10',
+      distancia: 'KM_5'
+    });
+
+    expect(resultado.sucesso).toBe(false);
+
+    if (!resultado.sucesso) {
+      expect(resultado.erro).toBe('INSCRICAO_NAO_ENCONTRADA');
+    }
+
+    expect(service.inscricoes().length).toBe(0);
+  });
+
+
 });

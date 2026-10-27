@@ -15,10 +15,13 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('5ª Corrida Solidária da Vila Esperança');
+  it('should render the router outlet', async () => {
+  const fixture = TestBed.createComponent(App);
+
+  await fixture.whenStable();
+
+  const compiled = fixture.nativeElement as HTMLElement;
+
+  expect(compiled.querySelector('router-outlet')).not.toBeNull();
   });
 });
