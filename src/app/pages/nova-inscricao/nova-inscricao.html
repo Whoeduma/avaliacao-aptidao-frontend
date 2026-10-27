@@ -8,9 +8,7 @@
     aria-labelledby="titulo-modal"
   >
 
-    <!-- Cabeçalho -->
     <header class="modal-cabecalho">
-
       <div>
         <h2 id="titulo-modal">Nova inscrição</h2>
         <p>Todos os campos são obrigatórios.</p>
@@ -24,15 +22,13 @@
       >
         &times;
       </button>
-
     </header>
 
-    <!-- Formulário -->
     <form (ngSubmit)="confirmarInscricao()" novalidate>
 
       <div class="modal-conteudo">
 
-        <!-- Nome -->
+        <!-- Nome completo -->
         <div class="campo">
 
           <label for="nome">Nome completo</label>
@@ -44,12 +40,12 @@
             placeholder="Ex.: Maria Aparecida Souza"
             autocomplete="name"
             [(ngModel)]="dados.nome"
-            [class.campo-invalido]="erros['nome']"
-            required
+            [class.campo-invalido]="!!erros['nome']"
+            [attr.aria-invalid]="!!erros['nome']"
           />
 
           @if (erros['nome']) {
-            <p class="mensagem-erro">
+            <p class="mensagem-erro" role="alert">
               {{ erros['nome'] }}
             </p>
           }
@@ -68,12 +64,12 @@
             placeholder="Ex.: maria.souza@email.com"
             autocomplete="email"
             [(ngModel)]="dados.email"
-            [class.campo-invalido]="erros['email']"
-            required
+            [class.campo-invalido]="!!erros['email']"
+            [attr.aria-invalid]="!!erros['email']"
           />
 
           @if (erros['email']) {
-            <p class="mensagem-erro">
+            <p class="mensagem-erro" role="alert">
               {{ erros['email'] }}
             </p>
           }
@@ -82,7 +78,7 @@
 
         <div class="campos-linha">
 
-          <!-- Data de nascimento -->
+          <!-- Nascimento -->
           <div class="campo">
 
             <label for="nascimento">
@@ -93,14 +89,13 @@
               id="nascimento"
               name="nascimento"
               type="date"
-              autocomplete="bday"
               [(ngModel)]="dados.nascimento"
-              [class.campo-invalido]="erros['nascimento']"
-              required
+              [class.campo-invalido]="!!erros['nascimento']"
+              [attr.aria-invalid]="!!erros['nascimento']"
             />
 
             @if (erros['nascimento']) {
-              <p class="mensagem-erro">
+              <p class="mensagem-erro" role="alert">
                 {{ erros['nascimento'] }}
               </p>
             }
@@ -116,15 +111,16 @@
               id="distancia"
               name="distancia"
               [(ngModel)]="dados.distancia"
-              [class.campo-invalido]="erros['distancia']"
-              required
+              [class.campo-invalido]="!!erros['distancia']"
+              [attr.aria-invalid]="!!erros['distancia']"
             >
+              <option value="">Selecione o percurso</option>
               <option value="KM_5">5 km</option>
               <option value="KM_10">10 km</option>
             </select>
 
             @if (erros['distancia']) {
-              <p class="mensagem-erro">
+              <p class="mensagem-erro" role="alert">
                 {{ erros['distancia'] }}
               </p>
             }
@@ -133,7 +129,6 @@
 
         </div>
 
-        <!-- Erro geral -->
         @if (erros['geral']) {
           <p class="mensagem-erro" role="alert">
             {{ erros['geral'] }}
@@ -142,7 +137,6 @@
 
       </div>
 
-      <!-- Botões -->
       <footer class="modal-rodape">
 
         <button

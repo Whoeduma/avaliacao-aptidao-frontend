@@ -1,9 +1,20 @@
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import {
-  InscricaoService, type DadosCadastro, type ResultadoCadastro} from '../../core/services/inscricao';
+  InscricaoService,
+  type DadosCadastro,
+  type ResultadoCadastro
+} from '../../core/services/inscricao';
+
+import {
+  validarNome,
+  validarEmail,
+  validarNascimento,
+  type Distancia
+} from '../../dominio/inscricao.regras';
 
 @Component({
   selector: 'app-nova-inscricao',
@@ -12,25 +23,68 @@ import {
   styleUrl: './nova-inscricao.css'
 })
 export class NovaInscricao {
+
   private readonly inscricaoService = inject(InscricaoService);
   private readonly router = inject(Router);
 
-  dados: DadosCadastro = {
+  // Dados preenchidos pelo usuário
+  dados: {
+    nome: string;
+    email: string;
+    nascimento: string;
+    distancia: Distancia | '';
+  } = {
     nome: '',
     email: '',
     nascimento: '',
-    distancia: 'KM_5'
+    distancia: ''
   };
 
+  // Erros exibidos na tela
   erros: Record<string, string> = {};
 
-  confirmarInscricao(): void{
+  confirmarInscricao(): void {
     this.erros = {};
 
-    const resultado = this.inscricaoService.cadastrar(this.dados);
+    // Verifica todos os campos antes de tentar cadastrar
+    if (!this.dados.nome.trim()) {
+      this.erros['nome'] = 'Informe o nome completo.';
+    } else if (!validarNome(this.dados.nome)) {
+      this.erros['nome'] = 'Informe um nome válido.';
+    }
 
-    if(resultado.sucesso) {
-      //vai fechar o modal e volta para a lista
+    if (!this.dados.email.trim()) {
+      this.erros['email'] = 'Informe o e-mail.';
+    } else if (!validarEmail(this.dados.email)) {
+      this.erros['email'] = 'Informe um e-mail válido.';
+    }
+
+    if (!this.dados.nascimento) {
+      this.erros['nascimento'] = 'Informe a data de nascimento.';
+    } else if (!validarNascimento(this.dados.nascimento)) {
+      this.erros['nascimento'] = 'Informe uma data válida.';
+    }
+
+    if (!this.dados.distancia) {
+      this.erros['distancia'] = 'Escolha o percurso.';
+    }
+
+    // Se houver qualquer erro, não cadastra
+    if (Object.keys(this.erros).length > 0) {
+      return;
+    }
+
+    // Todos os campos foram preenchidos e validados
+    const dadosCadastro: DadosCadastro = {
+      nome: this.dados.nome,
+      email: this.dados.email,
+      nascimento: this.dados.nascimento,
+      distancia: this.dados.distancia as Distancia
+    };
+
+    const resultado = this.inscricaoService.cadastrar(dadosCadastro);
+
+    if (resultado.sucesso) {
       this.router.navigate(['/inscricoes']);
       return;
     }
@@ -41,25 +95,22 @@ export class NovaInscricao {
   private mostrarErro(
     erro: Extract<ResultadoCadastro, { sucesso: false }>['erro']
   ): void {
+
     switch (erro) {
       case 'NOME_INVALIDO':
-        this.erros['nome'] =
-          'Informe um nome completo entre 3 e 100 caracteres.';
+        this.erros['nome'] = 'Informe um nome válido.';
         break;
 
-         case 'EMAIL_INVALIDO':
-        this.erros['email'] =
-          'Informe um e-mail válido.';
+      case 'EMAIL_INVALIDO':
+        this.erros['email'] = 'Informe um e-mail válido.';
         break;
 
       case 'EMAIL_DUPLICADO':
-        this.erros['email'] =
-          'Este e-mail já está cadastrado.';
+        this.erros['email'] = 'Este e-mail já está cadastrado.';
         break;
 
       case 'DATA_INVALIDA':
-        this.erros['nascimento'] =
-          'Informe uma data de nascimento válida.';
+        this.erros['nascimento'] = 'Informe uma data válida.';
         break;
 
       case 'IDADE_MINIMA':
@@ -76,7 +127,6 @@ export class NovaInscricao {
         this.erros['geral'] =
           'Não foi possível salvar a inscrição. Tente novamente.';
         break;
-
-      }  
+    }
   }
 }
