@@ -1,0 +1,102 @@
+
+<div class="fundo-modal-edicao">
+  <section
+    class="modal-edicao"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-edicao"
+  >
+    @if (inscricao) {
+      <div class="cabecalho-modal-edicao">
+        <div>
+          <h2 id="titulo-edicao">Editar inscrição</h2>
+          <p>Atualize os dados do participante</p>
+        </div>
+
+        <a
+          routerLink="/inscricoes"
+          class="fechar-modal-edicao"
+          aria-label="Fechar edição"
+        >
+          &times;
+        </a>
+      </div>
+
+      <form (ngSubmit)="salvar()" #formulario="ngForm">
+        <div class="conteudo-modal-edicao">
+          <div class="campo-edicao">
+            <label for="nome-edicao">Nome completo</label>
+            <input
+              id="nome-edicao"
+              name="nome"
+              type="text"
+              [(ngModel)]="nome"
+              minlength="3"
+              maxlength="100"
+              required
+            />
+          </div>
+
+          <div class="campo-edicao">
+            <label for="email-edicao">E-mail</label>
+            <input
+              id="email-edicao"
+              type="email"
+              [value]="inscricao.email"
+              disabled
+            />
+            <small>O e-mail não pode ser alterado.</small>
+          </div>
+
+          <div class="campo-edicao">
+            <label for="nascimento-edicao">Data de nascimento</label>
+            <input
+              id="nascimento-edicao"
+              name="nascimento"
+              type="date"
+              [(ngModel)]="nascimento"
+              required
+            />
+          </div>
+
+          <div class="campo-edicao">
+            <label for="distancia-edicao">Percurso</label>
+            <select
+              id="distancia-edicao"
+              name="distancia"
+              [(ngModel)]="distancia"
+              required
+            >
+              <option value="KM_5">5 km</option>
+              <option value="KM_10">10 km</option>
+            </select>
+          </div>
+
+          @if (erro) {
+            <p class="erro-edicao" role="alert">{{ erro }}</p>
+          }
+        </div>
+
+        <div class="rodape-modal-edicao">
+          <a routerLink="/inscricoes" class="botao-voltar-edicao">
+            Cancelar
+          </a>
+
+          <button
+            type="submit"
+            class="botao-salvar-edicao"
+            [disabled]="formulario.invalid"
+          >
+            Salvar alterações
+          </button>
+        </div>
+      </form>
+    } @else {
+      <div class="conteudo-modal-edicao">
+        <h2 id="titulo-edicao">Inscrição não encontrada</h2>
+        <p>Não encontramos esse participante.</p>
+        <a routerLink="/inscricoes">Voltar às inscrições</a>
+      </div>
+    }
+  </section>
+</div>

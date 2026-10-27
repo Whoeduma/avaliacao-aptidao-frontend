@@ -298,16 +298,6 @@
   border-top: 1px solid var(--borda);
 }
 
-.acao-em-breve {
-  color: var(--primaria);
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.acao-perigo {
-  color: var(--texto-suave);
-}
-
 /* Botão de cancelamento */
 
 .botao-cancelar-inscricao {
@@ -483,7 +473,10 @@
   outline-offset: 2px;
 }
 
-.botao-detalhes {
+/* Links de ações */
+
+.botao-detalhes,
+.botao-editar {
   display: inline-flex;
   align-items: center;
   padding: 6px 0;
@@ -494,6 +487,7 @@
   cursor: pointer;
 }
 
-.botao-detalhes:hover {
+.botao-detalhes:hover,
+.botao-editar:hover {
   text-decoration: underline;
 }

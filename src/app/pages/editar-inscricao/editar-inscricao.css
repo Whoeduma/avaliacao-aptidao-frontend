@@ -1,0 +1,150 @@
+
+.fundo-modal-edicao {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(18, 27, 45, 0.5);
+}
+
+.modal-edicao {
+  width: 100%;
+  max-width: 460px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.16);
+}
+
+.cabecalho-modal-edicao {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.cabecalho-modal-edicao h2 {
+  margin: 0 0 5px;
+  font-size: 18px;
+}
+
+.cabecalho-modal-edicao p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.fechar-modal-edicao {
+  color: #64748b;
+  font-size: 26px;
+  text-decoration: none;
+}
+
+.conteudo-modal-edicao {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+}
+
+.campo-edicao {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.campo-edicao label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.campo-edicao input,
+.campo-edicao select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+}
+
+.campo-edicao input:focus,
+.campo-edicao select:focus {
+  outline: 2px solid #a5b4fc;
+  border-color: #6366f1;
+}
+
+.campo-edicao input:disabled {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.campo-edicao small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.erro-edicao {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.rodape-modal-edicao {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.botao-voltar-edicao,
+.botao-salvar-edicao {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.botao-voltar-edicao {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.botao-salvar-edicao {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.botao-salvar-edicao:hover {
+  background: #4338ca;
+}
+
+.botao-salvar-edicao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 420px) {
+  .rodape-modal-edicao {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}

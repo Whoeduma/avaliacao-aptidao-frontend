@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { Inscricoes } from './pages/inscricoes/inscricoes';
 import { NovaInscricao } from './pages/nova-inscricao/nova-inscricao';
 import { DetalhesInscricao } from './pages/detalhes-inscricao/detalhes-inscricao';
+import { EditarInscricao } from './pages/editar-inscricao/editar-inscricao';
 
 export const routes: Routes = [
   {
@@ -19,9 +20,17 @@ export const routes: Routes = [
         component: NovaInscricao
       },
       {
+        path: ':email/editar',
+        component: EditarInscricao
+      },
+      {
         path: ':email',
         component: DetalhesInscricao
       }
     ]
+  },
+  {
+    path: '**',
+    redirectTo: 'inscricoes'
   }
 ];

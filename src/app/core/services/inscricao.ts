@@ -30,6 +30,7 @@ export type ResultadoCadastro =
         | 'ERRO_ARMAZENAMENTO'
         | 'EMAIL_INVALIDO'
         | 'DATA_INVALIDA'
+        | 'INSCRICAO_NAO_ENCONTRADA'
         | ErroRegulamento;
     };
 
@@ -188,4 +189,64 @@ export class InscricaoService {
 
     return { sucesso: true };
   }
+  
+obterPorEmail(email: string): Inscricao | undefined {
+  const emailNormalizado = normalizarEmail(email);
+
+  return this.inscricoesSignal().find(
+    inscricao => normalizarEmail(inscricao.email) === emailNormalizado
+  );
+}
+
+editar(
+  emailOriginal: string,
+  dados: Pick<DadosCadastro, 'nome' | 'nascimento' | 'distancia'>
+): ResultadoCadastro {
+  const email = normalizarEmail(emailOriginal);
+
+  if (!this.obterPorEmail(email)) {
+    return { sucesso: false, erro: 'INSCRICAO_NAO_ENCONTRADA' };
+  }
+
+  if (!validarNome(dados.nome)) {
+    return { sucesso: false, erro: 'NOME_INVALIDO' };
+  }
+
+  if (!validarNascimento(dados.nascimento)) {
+    return { sucesso: false, erro: 'DATA_INVALIDA' };
+  }
+
+  const avaliacao = avaliarInscricao(
+    dados.nascimento,
+    dados.distancia,
+    '2027-03-14'
+  );
+
+  if (!avaliacao.aceita) {
+    return { sucesso: false, erro: avaliacao.erro! };
+  }
+
+  const listaAtualizada = this.inscricoesSignal().map(inscricao =>
+    normalizarEmail(inscricao.email) === email
+      ? {
+          ...inscricao,
+          nome: dados.nome.trim().replace(/\s+/g, ' '),
+          nascimento: dados.nascimento,
+          distancia: dados.distancia,
+          idadeNaProva: avaliacao.idadeNaProva,
+          categoria: avaliacao.categoria!
+        }
+      : inscricao
+  );
+
+  if (!this.salvarInscricoes(listaAtualizada)) {
+    return { sucesso: false, erro: 'ERRO_ARMAZENAMENTO' };
+  }
+
+  this.inscricoesSignal.set(listaAtualizada);
+
+  return { sucesso: true };
+}
+
+  
 }
