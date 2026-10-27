@@ -1,0 +1,200 @@
+
+/* Fundo escurecido atrás do pop-up */
+.modal-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  background: rgba(15, 23, 42, 0.52);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+}
+
+/* Janela do formulário */
+.modal-inscricao {
+  width: 100%;
+  max-width: 515px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+
+  background: var(--superficie);
+  color: var(--texto);
+
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-modal);
+}
+
+/* Cabeçalho */
+.modal-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+
+  padding: 22px 20px 16px;
+  border-bottom: 1px solid var(--borda);
+}
+
+.modal-cabecalho h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.modal-cabecalho p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  color: var(--texto-suave);
+}
+
+/* Botão X */
+.botao-fechar {
+  background: transparent;
+  border: none;
+
+  color: var(--texto-fraco);
+  font-size: 25px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.botao-fechar:hover {
+  color: var(--texto);
+}
+
+/* Conteúdo do formulário */
+.modal-conteudo {
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Cada campo */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.campo label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Inputs e select */
+.campo input, .campo select {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--borda-forte);
+  border-radius: 9px;
+  background: var(--superficie);
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.campo input::placeholder {
+  color: var(--texto-fraco);
+}
+
+/* Destaque quando selecionamos um campo */
+.campo input:focus,
+.campo select:focus {
+  outline: none;
+  border-color: var(--primaria);
+  box-shadow: var(--foco);
+}
+
+/* Data e percurso lado a lado */
+.campos-linha {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Rodapé */
+.modal-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+
+  padding: 16px 20px;
+
+  border-top: 1px solid var(--borda);
+  background: var(--fundo);
+}
+
+/* Estilo compartilhado dos botões */
+.botao-cancelar,
+.botao-confirmar {
+  padding: 11px 17px;
+
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+/* Cancelar */
+.botao-cancelar {
+  background: var(--superficie);
+  color: var(--texto);
+  border: 1px solid var(--borda-forte);
+}
+
+.botao-cancelar:hover {
+  background: var(--fundo);
+}
+
+/* Confirmar inscrição */
+.botao-confirmar {
+  background: var(--primaria);
+  color: #FFFFFF;
+  border: 1px solid var(--primaria);
+}
+
+.botao-confirmar:hover {
+  background: var(--primaria-escura);
+}
+
+/* Estilos que usaremos nas validações */
+.campo input.campo-invalido,
+.campo select.campo-invalido {
+  border-color: var(--erro);
+  background: var(--erro-fundo);
+}
+
+.mensagem-erro {
+  color: var(--erro);
+  font-size: 12px;
+  margin: 0;
+}
+
+/* Adaptação para celulares */
+@media (max-width: 480px) {
+  .campos-linha {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-rodape {
+    flex-wrap: wrap;
+  }
+
+  .botao-cancelar,
+  .botao-confirmar {
+    flex: 1;
+  }
+}

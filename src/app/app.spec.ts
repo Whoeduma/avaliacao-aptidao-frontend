@@ -19,6 +19,6 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, corrida-solidaria');
+    expect(compiled.querySelector('h1')?.textContent).toContain('5ª Corrida Solidária da Vila Esperança');
   });
 });

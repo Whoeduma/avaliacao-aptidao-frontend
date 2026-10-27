@@ -1,0 +1,232 @@
+
+/* Página principal */
+.pagina-inscricoes {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 24px 40px;
+  box-sizing: border-box;
+}
+
+/* Cabeçalho */
+.cabecalho-pagina {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.informacoes-evento h1 {
+  margin: 0;
+  color: var(--texto);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.informacoes-evento p {
+  margin: 5px 0 0;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+/* Contadores e botão */
+.acoes-cabecalho {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.contador {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  padding: 8px 12px;
+
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.contador strong {
+  color: var(--texto);
+}
+
+/* Botão de nova inscrição */
+.botao-nova-inscricao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 12px 18px;
+
+  background: var(--primaria);
+  color: #FFFFFF;
+
+  border-radius: 9px;
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  box-shadow: var(--sombra-card);
+  transition: background 0.2s;
+}
+
+.botao-nova-inscricao:hover {
+  background: var(--primaria-escura);
+}
+
+/* Navegação */
+.navegacao {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  margin: 24px 0 12px;
+
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.navegacao a {
+  color: var(--primaria);
+  text-decoration: none;
+}
+
+.navegacao a:hover {
+  text-decoration: underline;
+}
+
+/* Quadro quando não existem inscrições */
+.estado-vazio {
+  min-height: 145px;
+  padding: 25px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  background: var(--superficie);
+  border: 1px dashed var(--borda-forte);
+  border-radius: var(--raio);
+
+  box-sizing: border-box;
+}
+
+.estado-vazio h2 {
+  margin: 0 0 8px;
+  color: var(--texto);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.estado-vazio p {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 14px;
+}
+
+/* Link clicável dentro do quadro vazio */
+.link-nova-inscricao {
+  color: var(--primaria);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link-nova-inscricao:hover {
+  color: var(--primaria-escura);
+  text-decoration: underline;
+}
+
+/* Lista de participantes */
+.lista-inscricoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cartao-inscricao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 18px 20px;
+
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-card);
+}
+
+.cartao-inscricao h3 {
+  margin: 0 0 5px;
+  color: var(--texto);
+  font-size: 15px;
+}
+
+.cartao-inscricao p {
+  margin: 0;
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.detalhes-inscricao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  color: var(--texto-suave);
+  font-size: 13px;
+}
+
+.etiqueta-distancia {
+  padding: 6px 10px;
+
+  background: var(--primaria-suave);
+  color: var(--primaria);
+
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Adaptação para celular */
+@media (max-width: 650px) {
+  .pagina-inscricoes {
+    padding: 16px;
+  }
+
+  .cabecalho-pagina {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acoes-cabecalho {
+    justify-content: flex-start;
+  }
+
+  .cartao-inscricao {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.data-evento {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.data-evento svg {
+  flex-shrink: 0;
+  color: var(--texto-fraco);
+}

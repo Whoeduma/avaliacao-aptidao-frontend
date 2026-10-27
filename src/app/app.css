@@ -1,0 +1,92 @@
+.cabecalho-site {
+  background: var(--superficie);
+  border-bottom: 1px solid var(--borda);
+}
+
+.cabecalho-conteudo {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.identidade-evento {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.icone-corrida {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--primaria);
+  color: #ffffff;
+  border-radius: 11px;
+
+  box-shadow: var(--sombra-card);
+}
+
+.nome-evento {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  font-size: 15px;
+  color: var(--texto);
+}
+
+.nome-evento span {
+  color: var(--texto-suave);
+}
+
+.contador-inscritos {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+
+  padding: 8px 12px;
+
+  background: #E2F4E9;
+  color: #166B3D;
+  border: 1px solid #B9E0C7;
+  border-radius: 999px;
+
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.contador-inscritos strong {
+  font-weight: 700;
+}
+
+@media (max-width: 650px) {
+  .cabecalho-conteudo {
+    padding: 12px 16px;
+  }
+
+  .nome-evento {
+    font-size: 13px;
+  }
+
+  .icone-corrida {
+    width: 36px;
+    height: 36px;
+  }
+
+  .contador-inscritos {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+}

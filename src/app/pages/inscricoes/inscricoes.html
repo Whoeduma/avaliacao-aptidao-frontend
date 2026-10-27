@@ -1,0 +1,106 @@
+<section class="pagina-inscricoes">
+
+  <!-- Cabeçalho da página -->
+  <header class="cabecalho-pagina">
+
+    <div class="informacoes-evento">
+      <h1>Inscrições</h1>
+      <p class="data-evento">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <path d="M16 3v4M8 3v4M3 10h18" />
+        </svg>
+
+        Domingo, 14/03/2027 · Praça da Matriz
+      </p>
+    </div>
+
+    <div class="acoes-cabecalho">
+
+      <span class="contador">
+        5 km: <strong>{{ total5km() }}</strong>
+      </span>
+
+      <span class="contador">
+        10 km: <strong>{{ total10km() }}</strong>
+      </span>
+
+      <a
+        routerLink="/inscricoes/nova"
+        class="botao-nova-inscricao"
+      >
+        + Nova inscrição
+      </a>
+
+    </div>
+
+  </header>
+
+  <!-- Navegação -->
+  <nav class="navegacao">
+    <a routerLink="/inscricoes">Todas as inscrições</a>
+    <span>· /inscricoes</span>
+  </nav>
+
+  <!-- Lista vazia -->
+  @if (inscricoes().length === 0) {
+
+    <div class="estado-vazio">
+      <h2>Nenhuma inscrição por enquanto</h2>
+
+      <p>
+        Clique em
+        <a
+          routerLink="/inscricoes/nova"
+          class="link-nova-inscricao"
+        >
+          + Nova inscrição
+        </a>
+        para cadastrar o primeiro participante.
+      </p>
+    </div>
+
+  } @else {
+
+    <!-- Lista de participantes -->
+    <div class="lista-inscricoes">
+
+      @for (inscricao of inscricoes(); track inscricao.email) {
+
+        <article class="cartao-inscricao">
+
+          <div>
+            <h3>{{ inscricao.nome }}</h3>
+            <p>{{ inscricao.email }}</p>
+          </div>
+
+          <div class="detalhes-inscricao">
+            <span class="etiqueta-distancia">
+              {{ inscricao.distancia === 'KM_5' ? '5 km' : '10 km' }}
+            </span>
+
+            <span>{{ inscricao.categoria }}</span>
+          </div>
+
+        </article>
+
+      }
+
+    </div>
+
+  }
+
+</section>
+
+<!--  pop-up -->
+<router-outlet></router-outlet>

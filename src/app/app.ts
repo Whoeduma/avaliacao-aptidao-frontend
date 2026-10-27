@@ -1,12 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { InscricaoService } from './core/services/inscricao';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.css',
+  imports: [RouterOutlet],
   templateUrl: './app.html',
+  styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('corrida-solidaria');
+  private readonly inscricaoService = inject(InscricaoService);
+
+  readonly totalInscritos = computed(
+    () => this.inscricaoService.inscricoes().length
+  );
 }

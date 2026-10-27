@@ -1,0 +1,169 @@
+
+<div class="modal-fundo">
+
+  <section
+    class="modal-inscricao"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="titulo-modal"
+  >
+
+    <!-- Cabeçalho -->
+    <header class="modal-cabecalho">
+
+      <div>
+        <h2 id="titulo-modal">Nova inscrição</h2>
+        <p>Todos os campos são obrigatórios.</p>
+      </div>
+
+      <button
+        type="button"
+        class="botao-fechar"
+        routerLink="/inscricoes"
+        aria-label="Fechar formulário"
+      >
+        &times;
+      </button>
+
+    </header>
+
+    <!-- Formulário -->
+    <form (ngSubmit)="confirmarInscricao()" novalidate>
+
+      <div class="modal-conteudo">
+
+        <!-- Nome -->
+        <div class="campo">
+
+          <label for="nome">Nome completo</label>
+
+          <input
+            id="nome"
+            name="nome"
+            type="text"
+            placeholder="Ex.: Maria Aparecida Souza"
+            autocomplete="name"
+            [(ngModel)]="dados.nome"
+            [class.campo-invalido]="erros['nome']"
+            required
+          />
+
+          @if (erros['nome']) {
+            <p class="mensagem-erro">
+              {{ erros['nome'] }}
+            </p>
+          }
+
+        </div>
+
+        <!-- E-mail -->
+        <div class="campo">
+
+          <label for="email">E-mail</label>
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Ex.: maria.souza@email.com"
+            autocomplete="email"
+            [(ngModel)]="dados.email"
+            [class.campo-invalido]="erros['email']"
+            required
+          />
+
+          @if (erros['email']) {
+            <p class="mensagem-erro">
+              {{ erros['email'] }}
+            </p>
+          }
+
+        </div>
+
+        <div class="campos-linha">
+
+          <!-- Data de nascimento -->
+          <div class="campo">
+
+            <label for="nascimento">
+              Data de nascimento
+            </label>
+
+            <input
+              id="nascimento"
+              name="nascimento"
+              type="date"
+              autocomplete="bday"
+              [(ngModel)]="dados.nascimento"
+              [class.campo-invalido]="erros['nascimento']"
+              required
+            />
+
+            @if (erros['nascimento']) {
+              <p class="mensagem-erro">
+                {{ erros['nascimento'] }}
+              </p>
+            }
+
+          </div>
+
+          <!-- Percurso -->
+          <div class="campo">
+
+            <label for="distancia">Percurso</label>
+
+            <select
+              id="distancia"
+              name="distancia"
+              [(ngModel)]="dados.distancia"
+              [class.campo-invalido]="erros['distancia']"
+              required
+            >
+              <option value="KM_5">5 km</option>
+              <option value="KM_10">10 km</option>
+            </select>
+
+            @if (erros['distancia']) {
+              <p class="mensagem-erro">
+                {{ erros['distancia'] }}
+              </p>
+            }
+
+          </div>
+
+        </div>
+
+        <!-- Erro geral -->
+        @if (erros['geral']) {
+          <p class="mensagem-erro" role="alert">
+            {{ erros['geral'] }}
+          </p>
+        }
+
+      </div>
+
+      <!-- Botões -->
+      <footer class="modal-rodape">
+
+        <button
+          type="button"
+          class="botao-cancelar"
+          routerLink="/inscricoes"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="botao-confirmar"
+        >
+          Confirmar inscrição
+        </button>
+
+      </footer>
+
+    </form>
+
+  </section>
+
+</div>

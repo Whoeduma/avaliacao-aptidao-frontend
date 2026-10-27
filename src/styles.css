@@ -1,1 +1,70 @@
-/* You can add global styles to this file, and also import other style files */
+
+:root {
+  /* Cores principais */
+  --fundo: #F2F5FA;
+  --superficie: #FFFFFF;
+  --borda: #E0E6EF;
+  --borda-forte: #C9D2E0;
+  /* Textos */
+  --texto: #1C2333;
+  --texto-suave: #556075;
+  --texto-fraco: #7C879C;
+  /* Identidade visual */
+  --primaria: #2B50D8;
+  --primaria-escura: #2142B4;
+  --primaria-suave: #EAF0FF;
+  /* Validações */
+  --erro: #C42B38;
+  --erro-fundo: #FDEEEF;
+  --erro-borda: #F3C3C8;
+  /* Bordas e sombras */
+  --raio: 12px;
+  --sombra-card:
+    0 1px 2px rgba(20, 30, 55, 0.05),
+    0 2px 6px rgba(20, 30, 55, 0.04);
+  --sombra-modal:
+    0 24px 64px rgba(15, 23, 42, 0.28),
+    0 4px 12px rgba(15, 23, 42, 0.12);
+  --foco: 0 0 0 3px rgba(43, 80, 216, 0.28);
+
+  font-family: "Segoe UI", system-ui, Arial, sans-serif;
+}
+
+/* Configuração geral */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: "Segoe UI", system-ui, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Área principal da aplicação */
+.conteudo-principal {
+  min-height: calc(100vh - 65px);
+}
+
+/* Fontes dos campos e botões */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Acessibilidade pelo teclado */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--primaria);
+  outline-offset: 3px;
+}
