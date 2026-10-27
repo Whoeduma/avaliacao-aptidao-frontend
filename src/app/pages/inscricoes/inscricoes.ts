@@ -1,6 +1,6 @@
-
 import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+
 import { InscricaoService } from '../../core/services/inscricao';
 
 @Component({
@@ -10,6 +10,7 @@ import { InscricaoService } from '../../core/services/inscricao';
   styleUrl: './inscricoes.css'
 })
 export class Inscricoes {
+
   private readonly inscricaoService = inject(InscricaoService);
 
   readonly inscricoes = this.inscricaoService.inscricoes;
@@ -25,4 +26,9 @@ export class Inscricoes {
       inscricao => inscricao.distancia === 'KM_10'
     ).length
   );
+
+  formatarData(data: string): string {
+    const [ano, mes, dia] = data.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
 }
