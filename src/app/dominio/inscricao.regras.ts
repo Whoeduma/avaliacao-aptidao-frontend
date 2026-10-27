@@ -92,13 +92,16 @@ export function validarNome(nome: string): boolean {
     return nomeTratado.length >= 3 && nomeTratado.length <= 100;
 }
 
+
 export function validarEmail(email: string): boolean {
-    const emailNormalizado = normalizarEmail(email);
+  const emailNormalizado = normalizarEmail(email);
 
-    const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const formatoEmail =
+    /^[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9-]{2,}(?:\.[a-zA-Z]{2,})+$/;
 
-    return formatoEmail.test(emailNormalizado);
+  return formatoEmail.test(emailNormalizado);
 }
+
 
 export function validarNascimento(nascimento: string): boolean {
     if(!/^\d{4}-\d{2}-\d{2}$/.test(nascimento)) {
