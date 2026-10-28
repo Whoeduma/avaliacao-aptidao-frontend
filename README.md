@@ -132,19 +132,13 @@ As categorias utilizadas são:
 
 Durante a análise do material fornecido, foram identificados alguns pontos que exigiram decisões de implementação.
 
-### 1. Data da corrida
-
-O áudio menciona a data **13/03/2027**, enquanto o regulamento oficial informa **14/03/2027**.
-
-**Decisão:** utilizar **14/03/2027**, por ser a data presente no regulamento oficial.
-
-### 2. Cálculo da idade
+### 1. Cálculo da idade
 
 A idade poderia ser interpretada apenas pela diferença entre os anos de nascimento e da corrida.
 
 **Decisão:** calcular a **idade completa do participante na data da prova**, considerando dia, mês e ano.
 
-### 3. E-mail compartilhado
+### 2. E-mail compartilhado
 
 Existe uma sugestão de que familiares possam compartilhar o mesmo endereço de e-mail, mas a regra estabelece que cada e-mail identifica uma única inscrição.
 
@@ -157,13 +151,13 @@ Na comparação dos endereços, são normalizados apenas:
 
 Não são realizadas alterações específicas de provedores, como remover pontos de endereços Gmail.
 
-### 4. Alteração do e-mail
+### 3. Alteração do e-mail
 
 Como o e-mail funciona como identificador da inscrição, permitir sua alteração poderia comprometer a identificação do registro.
 
 **Decisão:** o e-mail não pode ser alterado durante a edição.
 
-### 5. Dados iniciais
+### 4. Dados iniciais
 
 Não foi identificada necessidade de carregar participantes fictícios ou registros de demonstração.
 
