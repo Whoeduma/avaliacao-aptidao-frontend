@@ -1,8 +1,7 @@
-
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { InscricaoService } from '../../core/services/inscricao';
+import { InscricaoService, type InscricaoResponse } from '../../core/services/inscricao';
 
 @Component({
   selector: 'app-detalhes-inscricao',
@@ -15,12 +14,25 @@ export class DetalhesInscricao {
   private readonly inscricaoService = inject(InscricaoService);
 
   readonly email = this.route.snapshot.paramMap.get('email') ?? '';
+  readonly carregando = signal(true);
+  readonly inscricao = signal<InscricaoResponse | null>(null);
+  erro = '';
 
-  readonly inscricao = computed(() =>
-    this.inscricaoService.inscricoes().find(
-      inscricao => inscricao.email === this.email
-    )
-  );
+  constructor() {
+    this.inscricaoService.consultar(this.email).subscribe({
+      next: resposta => {
+        this.inscricao.set(resposta);
+        this.carregando.set(false);
+      },
+      error: erro => {
+        this.erro = this.inscricaoService.obterMensagemErro(
+          erro,
+          'Não foi possível carregar a inscrição.'
+        );
+        this.carregando.set(false);
+      }
+    });
+  }
 
   formatarData(data: string): string {
     const [ano, mes, dia] = data.split('-');

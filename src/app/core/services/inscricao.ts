@@ -1,23 +1,21 @@
-
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Inscricao } from '../../models/inscricao.model';
-import { DATA_PROVA } from '../../dominio/evento.config';
-import {
-  normalizarEmail,
-  avaliarInscricao,
-  validarNome,
-  validarEmail,
-  validarNascimento,
-  type Distancia,
-  type ErroRegulamento
-} from '../../dominio/inscricao.regras';
+import { Observable, tap } from 'rxjs';
 
-const STORAGE_KEY = 'corrida.inscricoes.v1';
+import { type Distancia } from '../../dominio/inscricao.regras';
+import { Inscricao } from '../../models/inscricao.model';
+
+const API_URL = 'http://localhost:8080/api/inscricoes';
 
 export interface DadosCadastro {
   nome: string;
   email: string;
+  nascimento: string;
+  distancia: Distancia;
+}
+
+export interface DadosAtualizacao {
+  nome: string;
   nascimento: string;
   distancia: Distancia;
 }
@@ -28,309 +26,114 @@ export interface InscricaoResponse {
   dataNascimento: string;
   percurso: Distancia;
   idadeNaProva: number;
-  categoria: string;
+  categoria: Inscricao['categoria'];
 }
 
-export type ResultadoCadastro =
-  | { sucesso: true; erro?: never }
-  | {
-      sucesso: false;
-      erro:
-        | 'NOME_INVALIDO'
-        | 'EMAIL_DUPLICADO'
-        | 'ERRO_ARMAZENAMENTO'
-        | 'EMAIL_INVALIDO'
-        | 'DATA_INVALIDA'
-        | 'INSCRICAO_NAO_ENCONTRADA'
-        | ErroRegulamento;
-    };
+export interface ResumoInscricoes {
+  total: number;
+  km5: number;
+  km10: number;
+}
 
-export type ResultadoCancelamento =
-  | { sucesso: true }
-  | {
-      sucesso: false;
-      erro: 'INSCRICAO_NAO_ENCONTRADA' | 'ERRO_ARMAZENAMENTO';
-    };
+interface ErroApi {
+  mensagem?: string;
+}
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class InscricaoService {
   private readonly http = inject(HttpClient);
-  cadastrarNaApi(dados: DadosCadastro) {
-  const corpoRequisicao = {
-    nome: dados.nome,
-    email: dados.email,
-    dataNascimento: dados.nascimento,
-    percurso: dados.distancia
-  };
-
-  return this.http.post<InscricaoResponse>(
-    'http://localhost:8080/api/inscricoes',
-    corpoRequisicao
-  );
-}
-
-  listarDaApi() {
-  return this.http.get<InscricaoResponse[]>(
-    'http://localhost:8080/api/inscricoes'
-  );
-}
-
-  consultarNaApi(email: string) {
-  const emailCodificado = encodeURIComponent(email);
-
-  return this.http.get<InscricaoResponse>(
-    `http://localhost:8080/api/inscricoes/${emailCodificado}`
-  );
-}
-
-  carregarDaApi(): void {
-  this.listarDaApi().subscribe({
-    next: (respostas) => {
-      const inscricoes: Inscricao[] = respostas.map(resposta => ({
-        nome: resposta.nome,
-        email: resposta.email,
-        nascimento: resposta.dataNascimento,
-        distancia: resposta.percurso,
-        idadeNaProva: resposta.idadeNaProva,
-        categoria: resposta.categoria as Inscricao['categoria']
-      }));
-
-      this.inscricoesSignal.set(inscricoes);
-    },
-
-    error: (erro) => {
-      console.error('Erro ao carregar inscrições:', erro);
-    }
-  });
-}
-
-cancelarNaApi(email: string) {
-  const emailCodificado = encodeURIComponent(email);
-
-  return this.http.delete<void>(
-    `http://localhost:8080/api/inscricoes/${emailCodificado}`
-  );
-}
-
-  readonly avisoArmazenamento = signal('');
-  private readonly inscricoesSignal = signal<Inscricao[]>(
-    this.carregarInscricoes()
-  );
+  private readonly inscricoesSignal = signal<Inscricao[]>([]);
+  private readonly resumoSignal = signal<ResumoInscricoes>({ total: 0, km5: 0, km10: 0 });
 
   readonly inscricoes = this.inscricoesSignal.asReadonly();
+  readonly resumo = this.resumoSignal.asReadonly();
+  readonly carregando = signal(false);
+  readonly erroCarregamento = signal('');
 
-  private carregarInscricoes(): Inscricao[] {
-    try {
-      const dados = localStorage.getItem(STORAGE_KEY);
+  carregar(): void {
+    this.carregando.set(true);
+    this.erroCarregamento.set('');
 
-      if (!dados) {
-        return [];
+    this.http.get<InscricaoResponse[]>(API_URL).subscribe({
+      next: respostas => {
+        this.inscricoesSignal.set(respostas.map(resposta => this.mapear(resposta)));
+        this.carregando.set(false);
+      },
+      error: erro => {
+        this.erroCarregamento.set(
+          this.obterMensagemErro(erro, 'Não foi possível carregar as inscrições.')
+        );
+        this.carregando.set(false);
       }
+    });
 
-      const inscricoes = JSON.parse(dados);
-
-      if (!Array.isArray(inscricoes) || !inscricoes.every((item: unknown) => this.inscricaoArmazenadaValida(item))) {
-        this.avisoArmazenamento.set('Os dados salvos estão inválidos. A lista foi iniciada vazia. Um novo cadastro substituirá os dados armazenados.');
-        return [];
-      }
-
-      return inscricoes;
-    } catch {
-      this.avisoArmazenamento.set('Não foi possível ler as inscrições salvas. A lista foi iniciada vazia. Um novo cadastro substituirá os dados armazenados.');
-      return [];
-    }
+    this.carregarResumo();
   }
 
-  private inscricaoArmazenadaValida(item: unknown): item is Inscricao {
-    if (typeof item !== 'object' || item === null) return false;
-    const registro = item as Record<string, unknown>;
-    if (typeof registro['nome'] !== 'string' || !validarNome(registro['nome']) ||
-        typeof registro['email'] !== 'string' || !validarEmail(registro['email']) ||
-        typeof registro['nascimento'] !== 'string' || !validarNascimento(registro['nascimento']) ||
-        (registro['distancia'] !== 'KM_5' && registro['distancia'] !== 'KM_10')) return false;
-    const avaliacao = avaliarInscricao(registro['nascimento'], registro['distancia'], DATA_PROVA);
-    return avaliacao.aceita && registro['idadeNaProva'] === avaliacao.idadeNaProva &&
-      registro['categoria'] === avaliacao.categoria;
+  cadastrar(dados: DadosCadastro): Observable<InscricaoResponse> {
+    return this.http.post<InscricaoResponse>(API_URL, {
+      nome: dados.nome,
+      email: dados.email,
+      dataNascimento: dados.nascimento,
+      percurso: dados.distancia
+    });
   }
 
-  private salvarInscricoes(inscricoes: Inscricao[]): boolean {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(inscricoes));
-      return true;
-    } catch {
-      return false;
-    }
+  consultar(email: string): Observable<InscricaoResponse> {
+    return this.http.get<InscricaoResponse>(this.urlPorEmail(email));
   }
 
-  emailJaCadastrado(email: string): boolean {
-    const emailNormalizado = normalizarEmail(email);
+  editar(email: string, dados: DadosAtualizacao): Observable<InscricaoResponse> {
+    return this.http.put<InscricaoResponse>(this.urlPorEmail(email), {
+      nome: dados.nome,
+      dataNascimento: dados.nascimento,
+      percurso: dados.distancia
+    });
+  }
 
-    return this.inscricoesSignal().some(
-      inscricao =>
-        normalizarEmail(inscricao.email) === emailNormalizado
+  cancelar(email: string): Observable<void> {
+    return this.http.delete<void>(this.urlPorEmail(email)).pipe(
+      tap(() => {
+        this.inscricoesSignal.update(inscricoes =>
+          inscricoes.filter(inscricao => inscricao.email !== email)
+        );
+        this.carregarResumo();
+      })
     );
   }
 
-  cadastrar(dados: DadosCadastro): ResultadoCadastro {
-    const email = normalizarEmail(dados.email);
-
-    if (!validarNome(dados.nome)) {
-      return {
-        sucesso: false,
-        erro: 'NOME_INVALIDO'
-      };
+  obterMensagemErro(erro: unknown, mensagemPadrao: string): string {
+    if (erro instanceof HttpErrorResponse) {
+      const resposta = erro.error as ErroApi | string | null;
+      if (typeof resposta === 'object' && resposta?.mensagem) {
+        return resposta.mensagem;
+      }
+      if (erro.status === 0) {
+        return 'Não foi possível conectar ao servidor. Verifique se o backend está em execução.';
+      }
     }
+    return mensagemPadrao;
+  }
 
-    if (!validarEmail(dados.email)) {
-      return {
-        sucesso: false,
-        erro: 'EMAIL_INVALIDO'
-      };
-    }
+  private carregarResumo(): void {
+    this.http.get<ResumoInscricoes>(`${API_URL}/resumo`).subscribe({
+      next: resumo => this.resumoSignal.set(resumo),
+      error: () => this.resumoSignal.set({ total: 0, km5: 0, km10: 0 })
+    });
+  }
 
-    if (this.emailJaCadastrado(email)) {
-      return {
-        sucesso: false,
-        erro: 'EMAIL_DUPLICADO'
-      };
-    }
+  private urlPorEmail(email: string): string {
+    return `${API_URL}/${encodeURIComponent(email)}`;
+  }
 
-    if (!validarNascimento(dados.nascimento)) {
-      return {
-        sucesso: false,
-        erro: 'DATA_INVALIDA'
-      };
-    }
-
-    const avaliacao = avaliarInscricao(
-      dados.nascimento,
-      dados.distancia,
-      DATA_PROVA
-    );
-
-    if (!avaliacao.aceita) {
-      return {
-        sucesso: false,
-        erro: avaliacao.erro!
-      };
-    }
-
-    const novaInscricao: Inscricao = {
-      nome: dados.nome.trim().replace(/\s+/g, ' '),
-      email,
-      nascimento: dados.nascimento,
-      distancia: dados.distancia,
-      idadeNaProva: avaliacao.idadeNaProva,
-      categoria: avaliacao.categoria!
+  private mapear(resposta: InscricaoResponse): Inscricao {
+    return {
+      nome: resposta.nome,
+      email: resposta.email,
+      nascimento: resposta.dataNascimento,
+      distancia: resposta.percurso,
+      idadeNaProva: resposta.idadeNaProva,
+      categoria: resposta.categoria
     };
-
-    const listaAtualizada = [
-      ...this.inscricoesSignal(),
-      novaInscricao
-    ];
-
-    const salvou = this.salvarInscricoes(listaAtualizada);
-
-    if (!salvou) {
-      return {
-        sucesso: false,
-        erro: 'ERRO_ARMAZENAMENTO'
-      };
-    }
-
-    this.inscricoesSignal.set(listaAtualizada);
-
-    return { sucesso: true };
   }
-
-  cancelar(email: string): ResultadoCancelamento {
-    const emailNormalizado = normalizarEmail(email);
-
-    if (!this.emailJaCadastrado(emailNormalizado)) {
-      return {
-        sucesso: false,
-        erro: 'INSCRICAO_NAO_ENCONTRADA'
-      };
-    }
-
-    const listaAtualizada = this.inscricoesSignal().filter(
-      inscricao =>
-        normalizarEmail(inscricao.email) !== emailNormalizado
-    );
-
-    const salvou = this.salvarInscricoes(listaAtualizada);
-
-    if (!salvou) {
-      return {
-        sucesso: false,
-        erro: 'ERRO_ARMAZENAMENTO'
-      };
-    }
-
-    this.inscricoesSignal.set(listaAtualizada);
-
-    return { sucesso: true };
-  }
-  
-obterPorEmail(email: string): Inscricao | undefined {
-  const emailNormalizado = normalizarEmail(email);
-
-  return this.inscricoesSignal().find(
-    inscricao => normalizarEmail(inscricao.email) === emailNormalizado
-  );
-}
-
-editar(
-  emailOriginal: string,
-  dados: Pick<DadosCadastro, 'nome' | 'nascimento' | 'distancia'>
-): ResultadoCadastro {
-  const email = normalizarEmail(emailOriginal);
-
-  if (!this.obterPorEmail(email)) {
-    return { sucesso: false, erro: 'INSCRICAO_NAO_ENCONTRADA' };
-  }
-
-  if (!validarNome(dados.nome)) {
-    return { sucesso: false, erro: 'NOME_INVALIDO' };
-  }
-
-  if (!validarNascimento(dados.nascimento)) {
-    return { sucesso: false, erro: 'DATA_INVALIDA' };
-  }
-
-  const avaliacao = avaliarInscricao(
-    dados.nascimento,
-    dados.distancia,
-    DATA_PROVA
-  );
-
-  if (!avaliacao.aceita) {
-    return { sucesso: false, erro: avaliacao.erro! };
-  }
-
-  const listaAtualizada = this.inscricoesSignal().map(inscricao =>
-    normalizarEmail(inscricao.email) === email
-      ? {
-          ...inscricao,
-          nome: dados.nome.trim().replace(/\s+/g, ' '),
-          nascimento: dados.nascimento,
-          distancia: dados.distancia,
-          idadeNaProva: avaliacao.idadeNaProva,
-          categoria: avaliacao.categoria!
-        }
-      : inscricao
-  );
-
-  if (!this.salvarInscricoes(listaAtualizada)) {
-    return { sucesso: false, erro: 'ERRO_ARMAZENAMENTO' };
-  }
-
-  this.inscricoesSignal.set(listaAtualizada);
-
-  return { sucesso: true };
-}
-
-  
 }

@@ -54,8 +54,8 @@
 </header>
 
 <main class="conteudo-principal">
-  @if (avisoArmazenamento(); as aviso) {
-    <p role="alert" class="aviso-armazenamento">{{ aviso }}</p>
+  @if (erroCarregamento(); as erro) {
+    <p role="alert" class="aviso-armazenamento">{{ erro }}</p>
   }
   <router-outlet></router-outlet>
 </main>

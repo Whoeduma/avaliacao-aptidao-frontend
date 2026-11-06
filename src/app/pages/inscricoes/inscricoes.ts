@@ -1,4 +1,3 @@
-
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 
@@ -14,101 +13,70 @@ import { Inscricao } from '../../models/inscricao.model';
 export class Inscricoes {
   private readonly inscricaoService = inject(InscricaoService);
 
-  constructor() {
-  this.inscricaoService.carregarDaApi();
-}
-
-  // Lista original de participantes
   readonly inscricoes = this.inscricaoService.inscricoes;
-
-  // Texto digitado no campo de pesquisa
+  readonly carregando = this.inscricaoService.carregando;
+  readonly erroCarregamento = this.inscricaoService.erroCarregamento;
+  readonly resumo = this.inscricaoService.resumo;
   readonly busca = signal('');
+  readonly total5km = computed(() => this.resumo().km5);
+  readonly total10km = computed(() => this.resumo().km10);
 
-  // Remove acentos e ignora letras maiúsculas/minúsculas
-  private normalizarTexto(texto: string): string {
-    return texto
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-  }
-
-  // Filtra participantes por nome ou e-mail
-  readonly inscricoesFiltradas = computed(() => {
-    const termo = this.normalizarTexto(this.busca().trim());
-
-    if (!termo) {
-      return this.inscricoes();
-    }
-
-    return this.inscricoes().filter(inscricao =>
-      this.normalizarTexto(inscricao.nome).includes(termo) ||
-      this.normalizarTexto(inscricao.email).includes(termo)
-    );
-  });
-
-  // Atualiza a pesquisa enquanto o usuário digita
-  atualizarBusca(evento: Event): void {
-    const campo = evento.target as HTMLInputElement;
-    this.busca.set(campo.value);
-  }
-
-  // Participante selecionado para cancelamento
   inscricaoParaCancelar: Inscricao | null = null;
   erroCancelamento = '';
 
-  // Contadores de participantes por distância
-  readonly total5km = computed(() =>
-    this.inscricoes().filter(
-      inscricao => inscricao.distancia === 'KM_5'
-    ).length
-  );
+  constructor() {
+    this.inscricaoService.carregar();
+  }
 
-  readonly total10km = computed(() =>
-    this.inscricoes().filter(
-      inscricao => inscricao.distancia === 'KM_10'
-    ).length
-  );
+  readonly inscricoesFiltradas = computed(() => {
+    const termo = this.normalizarTexto(this.busca().trim());
+    if (!termo) {
+      return this.inscricoes();
+    }
+    return this.inscricoes().filter(inscricao =>
+      this.normalizarTexto(inscricao.nome).includes(termo)
+      || this.normalizarTexto(inscricao.email).includes(termo)
+    );
+  });
 
-  // Formata a data para o padrão brasileiro
+  atualizarBusca(evento: Event): void {
+    this.busca.set((evento.target as HTMLInputElement).value);
+  }
+
   formatarData(data: string): string {
     const [ano, mes, dia] = data.split('-');
     return `${dia}/${mes}/${ano}`;
   }
 
-  // Abre o modal de confirmação de cancelamento
   abrirCancelamento(inscricao: Inscricao): void {
     this.inscricaoParaCancelar = inscricao;
     this.erroCancelamento = '';
   }
 
-  // Fecha o modal de cancelamento
   fecharCancelamento(): void {
     this.inscricaoParaCancelar = null;
     this.erroCancelamento = '';
   }
 
-  // Confirma o cancelamento da inscrição
-  
-confirmarCancelamento(): void {
-  if (!this.inscricaoParaCancelar) {
-    return;
+  confirmarCancelamento(): void {
+    if (!this.inscricaoParaCancelar) {
+      return;
+    }
+    this.inscricaoService.cancelar(this.inscricaoParaCancelar.email).subscribe({
+      next: () => {
+        this.fecharCancelamento();
+        this.inscricaoService.carregar();
+      },
+      error: erro => {
+        this.erroCancelamento = this.inscricaoService.obterMensagemErro(
+          erro,
+          'Não foi possível cancelar a inscrição. Tente novamente.'
+        );
+      }
+    });
   }
 
-  const email = this.inscricaoParaCancelar.email;
-
-  this.inscricaoService.cancelarNaApi(email).subscribe({
-    next: () => {
-      this.fecharCancelamento();
-      this.inscricaoService.carregarDaApi();
-    },
-
-    error: (erro) => {
-      console.error('Erro ao cancelar inscrição:', erro);
-
-      this.erroCancelamento =
-        'Não foi possível cancelar a inscrição. Tente novamente.';
-    }
-  });
-}
-
+  private normalizarTexto(texto: string): string {
+    return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  }
 }

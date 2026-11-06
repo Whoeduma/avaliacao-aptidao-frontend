@@ -1,10 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { InscricaoService, type InscricaoResponse } from '../../core/services/inscricao';
-import { Distancia } from '../../dominio/inscricao.regras';
-import { Notificacao } from '../../core/services/notificacao';
 
+import { InscricaoService, type InscricaoResponse } from '../../core/services/inscricao';
+import { Notificacao } from '../../core/services/notificacao';
+import { type Distancia } from '../../dominio/inscricao.regras';
 
 @Component({
   selector: 'app-editar-inscricao',
@@ -18,66 +18,54 @@ export class EditarInscricao {
   private readonly inscricaoService = inject(InscricaoService);
   private readonly notificacao = inject(Notificacao);
 
-  
-readonly email = this.route.snapshot.paramMap.get('email') ?? '';
-inscricao: InscricaoResponse | null = null;
-
-carregando = signal(true);
-
-nome = '';
-nascimento = '';
-distancia: Distancia = 'KM_5';
-
-constructor() {
-  this.inscricaoService.consultarNaApi(this.email).subscribe({
-    next: (resposta) => {
-      this.inscricao = resposta;
-      this.nome = resposta.nome;
-      this.nascimento = resposta.dataNascimento;
-      this.distancia = resposta.percurso;
-      this.carregando.set(false);
-    },
-
-    error: (erro) => {
-      console.error('Erro ao consultar inscrição:', erro);
-      this.erro = 'Não foi possível carregar a inscrição.';
-      this.carregando.set(false);
-    }
-  });
-}
-
-
+  readonly email = this.route.snapshot.paramMap.get('email') ?? '';
+  readonly carregando = signal(true);
+  inscricao: InscricaoResponse | null = null;
+  nome = '';
+  nascimento = '';
+  distancia: Distancia = 'KM_5';
   erro = '';
+  salvando = false;
+
+  constructor() {
+    this.inscricaoService.consultar(this.email).subscribe({
+      next: resposta => {
+        this.inscricao = resposta;
+        this.nome = resposta.nome;
+        this.nascimento = resposta.dataNascimento;
+        this.distancia = resposta.percurso;
+        this.carregando.set(false);
+      },
+      error: erro => {
+        this.erro = this.inscricaoService.obterMensagemErro(
+          erro,
+          'Não foi possível carregar a inscrição.'
+        );
+        this.carregando.set(false);
+      }
+    });
+  }
 
   salvar(): void {
     this.erro = '';
-
-    const resultado = this.inscricaoService.editar(this.email, {
+    this.salvando = true;
+    this.inscricaoService.editar(this.email, {
       nome: this.nome,
       nascimento: this.nascimento,
       distancia: this.distancia
+    }).subscribe({
+      next: () => {
+        this.inscricaoService.carregar();
+        this.notificacao.mostrarSucesso('Inscrição atualizada com sucesso!');
+        this.router.navigate(['/inscricoes']);
+      },
+      error: erro => {
+        this.erro = this.inscricaoService.obterMensagemErro(
+          erro,
+          'Não foi possível salvar a inscrição.'
+        );
+        this.salvando = false;
+      }
     });
-
-    if (!resultado.sucesso) {
-      const mensagens: Record<string, string> = {
-        NOME_INVALIDO: 'Informe um nome válido, entre 3 e 100 caracteres.',
-        DATA_INVALIDA: 'Informe uma data de nascimento válida.',
-        IDADE_MINIMA: 'O participante precisa ter pelo menos 14 anos na data da prova.',
-        DISTANCIA_NAO_PERMITIDA: 'Menores de 18 anos só podem participar dos 5 km.',
-        INSCRICAO_NAO_ENCONTRADA: 'Inscrição não encontrada.',
-        ERRO_ARMAZENAMENTO: 'Não foi possível salvar. Tente novamente.'
-      };
-
-      this.erro = mensagens[resultado.erro] ?? 'Não foi possível salvar a inscrição.';
-      return;
-    }
-
-    
-      this.notificacao.mostrarSucesso(
-        'Inscrição atualizada com sucesso!'
-      );
-
-      this.router.navigate(['/inscricoes']);
-
   }
 }

@@ -19,7 +19,7 @@ import { Notificacao } from './core/services/notificacao';
 })
 export class App implements OnDestroy {
   private readonly inscricaoService = inject(InscricaoService);
-  readonly avisoArmazenamento = this.inscricaoService.avisoArmazenamento.asReadonly();
+  readonly erroCarregamento = this.inscricaoService.erroCarregamento;
   private readonly notificacao = inject(Notificacao);
 
   readonly mensagemSucesso = this.notificacao.mensagem;

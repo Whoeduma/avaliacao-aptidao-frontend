@@ -1,19 +1,13 @@
-
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+
+import { InscricaoService, type DadosCadastro } from '../../core/services/inscricao';
 import { Notificacao } from '../../core/services/notificacao';
-
 import {
-  InscricaoService,
-  type DadosCadastro,
-  type ResultadoCadastro
-} from '../../core/services/inscricao';
-
-import {
-  validarNome,
   validarEmail,
   validarNascimento,
+  validarNome,
   type Distancia
 } from '../../dominio/inscricao.regras';
 
@@ -24,124 +18,67 @@ import {
   styleUrl: './nova-inscricao.css'
 })
 export class NovaInscricao {
-
   private readonly inscricaoService = inject(InscricaoService);
   private readonly router = inject(Router);
   private readonly notificacao = inject(Notificacao);
 
-  // Dados preenchidos pelo usuário
   dados: {
     nome: string;
     email: string;
     nascimento: string;
     distancia: Distancia | '';
-  } = {
-    nome: '',
-    email: '',
-    nascimento: '',
-    distancia: ''
-  };
+  } = { nome: '', email: '', nascimento: '', distancia: '' };
 
-  // Erros exibidos na tela
   erros: Record<string, string> = {};
+  enviando = false;
 
   confirmarInscricao(): void {
     this.erros = {};
+    const nome = this.dados.nome.trim();
 
-    // Verifica todos os campos antes de tentar cadastrar
-   const nome = this.dados.nome.trim();
-
-if (!nome) {
-  this.erros['nome'] = 'Informe o nome completo.';
-} else if (nome.length < 3 || nome.length > 100) {
-  this.erros['nome'] = 'O nome deve conter entre 3 e 100 caracteres.';
-} else if (!validarNome(nome)) {
-  this.erros['nome'] = 'O nome deve conter apenas letras e espaços.';
-}
+    if (!nome) {
+      this.erros['nome'] = 'Informe o nome completo.';
+    } else if (!validarNome(nome)) {
+      this.erros['nome'] = 'O nome deve conter entre 3 e 100 caracteres.';
+    }
     if (!this.dados.email.trim()) {
       this.erros['email'] = 'Informe o e-mail.';
     } else if (!validarEmail(this.dados.email)) {
       this.erros['email'] = 'Informe um e-mail válido.';
     }
-
     if (!this.dados.nascimento) {
       this.erros['nascimento'] = 'Informe a data de nascimento.';
     } else if (!validarNascimento(this.dados.nascimento)) {
-      this.erros['nascimento'] = 'Informe uma data válida.';
+      this.erros['nascimento'] = 'Informe uma data válida e anterior a hoje.';
     }
-
     if (!this.dados.distancia) {
       this.erros['distancia'] = 'Escolha o percurso.';
     }
-
-    // Se houver qualquer erro, não cadastra
     if (Object.keys(this.erros).length > 0) {
       return;
     }
 
-    // Todos os campos foram preenchidos e validados
-    const dadosCadastro: DadosCadastro = {
+    const cadastro: DadosCadastro = {
       nome: this.dados.nome,
       email: this.dados.email,
       nascimento: this.dados.nascimento,
       distancia: this.dados.distancia as Distancia
     };
 
-    this.inscricaoService.cadastrarNaApi(dadosCadastro).subscribe({
-  next: (resposta) => {
-    this.inscricaoService.carregarDaApi();
-    this.notificacao.mostrarSucesso(
-      'Inscrição realizada com sucesso!'
-    );
-
-    this.router.navigate(['/inscricoes']);
-  },
-
-  error: (erro) => {
-    console.error('Erro ao cadastrar inscrição:', erro);
-
-    this.erros['geral'] =
-      'Não foi possível realizar a inscrição. Tente novamente.';
-  }
-});
-
-  }
-
-  private mostrarErro(
-    erro: Extract<ResultadoCadastro, { sucesso: false }>['erro']
-  ): void {
-
-    switch (erro) {
-      case 'NOME_INVALIDO':
-        this.erros['nome'] = 'Informe um nome válido.';
-        break;
-
-      case 'EMAIL_INVALIDO':
-        this.erros['email'] = 'Informe um e-mail válido.';
-        break;
-
-      case 'EMAIL_DUPLICADO':
-        this.erros['email'] = 'Este e-mail já está cadastrado.';
-        break;
-
-      case 'DATA_INVALIDA':
-        this.erros['nascimento'] = 'Informe uma data válida.';
-        break;
-
-      case 'IDADE_MINIMA':
-        this.erros['nascimento'] =
-          'É necessário ter pelo menos 14 anos na data da corrida.';
-        break;
-
-      case 'DISTANCIA_NAO_PERMITIDA':
-        this.erros['distancia'] =
-          'Participantes de 14 a 17 anos só podem correr 5 km.';
-        break;
-
-      case 'ERRO_ARMAZENAMENTO':
-        this.erros['geral'] =
-          'Não foi possível salvar a inscrição. Tente novamente.';
-        break;
-    }
+    this.enviando = true;
+    this.inscricaoService.cadastrar(cadastro).subscribe({
+      next: () => {
+        this.inscricaoService.carregar();
+        this.notificacao.mostrarSucesso('Inscrição realizada com sucesso!');
+        this.router.navigate(['/inscricoes']);
+      },
+      error: erro => {
+        this.erros['geral'] = this.inscricaoService.obterMensagemErro(
+          erro,
+          'Não foi possível realizar a inscrição. Tente novamente.'
+        );
+        this.enviando = false;
+      }
+    });
   }
 }

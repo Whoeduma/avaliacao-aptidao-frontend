@@ -91,7 +91,7 @@
           <button
             type="submit"
             class="botao-salvar-edicao"
-            [disabled]="formulario.invalid"
+            [disabled]="formulario.invalid || salvando"
           >
             Salvar alterações
           </button>

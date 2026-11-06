@@ -6,7 +6,11 @@
     aria-modal="true"
     aria-labelledby="titulo-detalhes"
   >
-    @if (inscricao(); as participante) {
+    @if (carregando()) {
+      <div class="conteudo-modal-detalhes">
+        <h2 id="titulo-detalhes">Carregando inscrição...</h2>
+      </div>
+    } @else if (inscricao(); as participante) {
       <div class="cabecalho-modal-detalhes">
         <div>
           <h2 id="titulo-detalhes">Detalhes da inscrição</h2>
@@ -36,7 +40,7 @@
         <div class="linha-detalhes">
           <div class="campo-detalhes">
             <span>Data de nascimento</span>
-            <strong>{{ formatarData(participante.nascimento) }}</strong>
+            <strong>{{ formatarData(participante.dataNascimento) }}</strong>
           </div>
 
           <div class="campo-detalhes">
@@ -63,7 +67,7 @@
           <div class="campo-detalhes">
             <span>Percurso</span>
             <span class="etiqueta-distancia">
-              {{ participante.distancia === 'KM_5' ? '5 km' : '10 km' }}
+              {{ participante.percurso === 'KM_5' ? '5 km' : '10 km' }}
             </span>
           </div>
         </div>
@@ -77,7 +81,7 @@
     } @else {
       <div class="conteudo-modal-detalhes">
         <h2 id="titulo-detalhes">Inscrição não encontrada</h2>
-        <p>Não encontramos uma inscrição com esse e-mail.</p>
+        <p>{{ erro || 'Não encontramos uma inscrição com esse e-mail.' }}</p>
 
         <a routerLink="/inscricoes" class="botao-fechar-detalhes">
           Voltar às inscrições
