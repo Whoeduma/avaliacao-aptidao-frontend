@@ -49,12 +49,15 @@ export class NovaInscricao {
     this.erros = {};
 
     // Verifica todos os campos antes de tentar cadastrar
-    if (!this.dados.nome.trim()) {
-      this.erros['nome'] = 'Informe o nome completo.';
-    } else if (!validarNome(this.dados.nome)) {
-      this.erros['nome'] = 'Informe um nome válido.';
-    }
+   const nome = this.dados.nome.trim();
 
+if (!nome) {
+  this.erros['nome'] = 'Informe o nome completo.';
+} else if (nome.length < 3 || nome.length > 100) {
+  this.erros['nome'] = 'O nome deve conter entre 3 e 100 caracteres.';
+} else if (!validarNome(nome)) {
+  this.erros['nome'] = 'O nome deve conter apenas letras e espaços.';
+}
     if (!this.dados.email.trim()) {
       this.erros['email'] = 'Informe o e-mail.';
     } else if (!validarEmail(this.dados.email)) {
@@ -84,19 +87,23 @@ export class NovaInscricao {
       distancia: this.dados.distancia as Distancia
     };
 
-    const resultado = this.inscricaoService.cadastrar(dadosCadastro);
+    this.inscricaoService.cadastrarNaApi(dadosCadastro).subscribe({
+  next: (resposta) => {
+    this.inscricaoService.carregarDaApi();
+    this.notificacao.mostrarSucesso(
+      'Inscrição realizada com sucesso!'
+    );
 
-    
-    if (resultado.sucesso) {
-      this.notificacao.mostrarSucesso(
-        'Inscrição realizada com sucesso!'
-      );
+    this.router.navigate(['/inscricoes']);
+  },
 
-      this.router.navigate(['/inscricoes']);
-      return;
-    }
+  error: (erro) => {
+    console.error('Erro ao cadastrar inscrição:', erro);
 
-    this.mostrarErro(resultado.erro);
+    this.erros['geral'] =
+      'Não foi possível realizar a inscrição. Tente novamente.';
+  }
+});
 
   }
 

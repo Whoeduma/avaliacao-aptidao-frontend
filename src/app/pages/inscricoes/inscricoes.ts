@@ -14,6 +14,10 @@ import { Inscricao } from '../../models/inscricao.model';
 export class Inscricoes {
   private readonly inscricaoService = inject(InscricaoService);
 
+  constructor() {
+  this.inscricaoService.carregarDaApi();
+}
+
   // Lista original de participantes
   readonly inscricoes = this.inscricaoService.inscricoes;
 
@@ -84,21 +88,27 @@ export class Inscricoes {
   }
 
   // Confirma o cancelamento da inscrição
-  confirmarCancelamento(): void {
-    if (!this.inscricaoParaCancelar) {
-      return;
-    }
+  
+confirmarCancelamento(): void {
+  if (!this.inscricaoParaCancelar) {
+    return;
+  }
 
-    const resultado = this.inscricaoService.cancelar(
-      this.inscricaoParaCancelar.email
-    );
+  const email = this.inscricaoParaCancelar.email;
 
-    if (!resultado.sucesso) {
+  this.inscricaoService.cancelarNaApi(email).subscribe({
+    next: () => {
+      this.fecharCancelamento();
+      this.inscricaoService.carregarDaApi();
+    },
+
+    error: (erro) => {
+      console.error('Erro ao cancelar inscrição:', erro);
+
       this.erroCancelamento =
         'Não foi possível cancelar a inscrição. Tente novamente.';
-      return;
     }
+  });
+}
 
-    this.fecharCancelamento();
-  }
 }

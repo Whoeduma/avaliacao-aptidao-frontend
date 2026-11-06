@@ -6,7 +6,13 @@
     aria-modal="true"
     aria-labelledby="titulo-edicao"
   >
-    @if (inscricao) {
+    @if (carregando()) {
+  <div class="conteudo-modal-edicao">
+    <h2 id="titulo-edicao">Carregando inscrição...</h2>
+    <p>Aguarde enquanto buscamos os dados do participante.</p>
+  </div>
+}
+    @else if (inscricao) {
       <div class="cabecalho-modal-edicao">
         <div>
           <h2 id="titulo-edicao">Editar inscrição</h2>
@@ -92,11 +98,11 @@
         </div>
       </form>
     } @else {
-      <div class="conteudo-modal-edicao">
-        <h2 id="titulo-edicao">Inscrição não encontrada</h2>
-        <p>Não encontramos esse participante.</p>
-        <a routerLink="/inscricoes">Voltar às inscrições</a>
-      </div>
-    }
+  <div class="conteudo-modal-edicao">
+    <h2 id="titulo-edicao">Não foi possível carregar a inscrição</h2>
+    <p>{{ erro || 'Não encontramos esse participante.' }}</p>
+    <a routerLink="/inscricoes">Voltar às inscrições</a>
+  </div>
+}
   </section>
 </div>

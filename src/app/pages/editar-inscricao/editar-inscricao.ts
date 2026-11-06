@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { InscricaoService } from '../../core/services/inscricao';
+import { InscricaoService, type InscricaoResponse } from '../../core/services/inscricao';
 import { Distancia } from '../../dominio/inscricao.regras';
 import { Notificacao } from '../../core/services/notificacao';
+
 
 @Component({
   selector: 'app-editar-inscricao',
@@ -17,12 +18,34 @@ export class EditarInscricao {
   private readonly inscricaoService = inject(InscricaoService);
   private readonly notificacao = inject(Notificacao);
 
-  readonly email = this.route.snapshot.paramMap.get('email') ?? '';
-  readonly inscricao = this.inscricaoService.obterPorEmail(this.email);
+  
+readonly email = this.route.snapshot.paramMap.get('email') ?? '';
+inscricao: InscricaoResponse | null = null;
 
-  nome = this.inscricao?.nome ?? '';
-  nascimento = this.inscricao?.nascimento ?? '';
-  distancia: Distancia = this.inscricao?.distancia ?? 'KM_5';
+carregando = signal(true);
+
+nome = '';
+nascimento = '';
+distancia: Distancia = 'KM_5';
+
+constructor() {
+  this.inscricaoService.consultarNaApi(this.email).subscribe({
+    next: (resposta) => {
+      this.inscricao = resposta;
+      this.nome = resposta.nome;
+      this.nascimento = resposta.dataNascimento;
+      this.distancia = resposta.percurso;
+      this.carregando.set(false);
+    },
+
+    error: (erro) => {
+      console.error('Erro ao consultar inscrição:', erro);
+      this.erro = 'Não foi possível carregar a inscrição.';
+      this.carregando.set(false);
+    }
+  });
+}
+
 
   erro = '';
 

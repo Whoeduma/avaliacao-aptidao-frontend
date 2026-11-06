@@ -1,5 +1,6 @@
 
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Inscricao } from '../../models/inscricao.model';
 import { DATA_PROVA } from '../../dominio/evento.config';
 import {
@@ -19,6 +20,15 @@ export interface DadosCadastro {
   email: string;
   nascimento: string;
   distancia: Distancia;
+}
+
+export interface InscricaoResponse {
+  nome: string;
+  email: string;
+  dataNascimento: string;
+  percurso: Distancia;
+  idadeNaProva: number;
+  categoria: string;
 }
 
 export type ResultadoCadastro =
@@ -46,6 +56,64 @@ export type ResultadoCancelamento =
   providedIn: 'root'
 })
 export class InscricaoService {
+  private readonly http = inject(HttpClient);
+  cadastrarNaApi(dados: DadosCadastro) {
+  const corpoRequisicao = {
+    nome: dados.nome,
+    email: dados.email,
+    dataNascimento: dados.nascimento,
+    percurso: dados.distancia
+  };
+
+  return this.http.post<InscricaoResponse>(
+    'http://localhost:8080/api/inscricoes',
+    corpoRequisicao
+  );
+}
+
+  listarDaApi() {
+  return this.http.get<InscricaoResponse[]>(
+    'http://localhost:8080/api/inscricoes'
+  );
+}
+
+  consultarNaApi(email: string) {
+  const emailCodificado = encodeURIComponent(email);
+
+  return this.http.get<InscricaoResponse>(
+    `http://localhost:8080/api/inscricoes/${emailCodificado}`
+  );
+}
+
+  carregarDaApi(): void {
+  this.listarDaApi().subscribe({
+    next: (respostas) => {
+      const inscricoes: Inscricao[] = respostas.map(resposta => ({
+        nome: resposta.nome,
+        email: resposta.email,
+        nascimento: resposta.dataNascimento,
+        distancia: resposta.percurso,
+        idadeNaProva: resposta.idadeNaProva,
+        categoria: resposta.categoria as Inscricao['categoria']
+      }));
+
+      this.inscricoesSignal.set(inscricoes);
+    },
+
+    error: (erro) => {
+      console.error('Erro ao carregar inscrições:', erro);
+    }
+  });
+}
+
+cancelarNaApi(email: string) {
+  const emailCodificado = encodeURIComponent(email);
+
+  return this.http.delete<void>(
+    `http://localhost:8080/api/inscricoes/${emailCodificado}`
+  );
+}
+
   readonly avisoArmazenamento = signal('');
   private readonly inscricoesSignal = signal<Inscricao[]>(
     this.carregarInscricoes()
